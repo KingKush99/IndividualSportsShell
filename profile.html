@@ -1,85 +1,288 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Profile · NHL Sports Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <title>Profile · Sumo Showdown Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="profile-page theme-1">
-  <button class="fab fab-profile" onclick="window.location.href='index.html'" aria-label="Back to main">
-    <span class="fab-icon">🏠</span>
-  </button>
-  <button class="fab fab-menu" onclick="toggleMenu()" aria-label="Main menu">
-    <span class="fab-icon">☰</span>
-  </button>
-  <button class="fab fab-slots" onclick="toggleSlots()" aria-label="Mini slots">
-    <span class="fab-icon">🎰</span>
-  </button>
-  <button class="fab fab-chat" onclick="toggleChat()" aria-label="Assistant chat">
-    <span class="fab-icon">💬</span>
-  </button>
-
-  <!-- reuse modals -->
-  <div id="menuDropdown" class="dropdown hidden"></div>
-  <div id="slotsModal" class="modal modal-dropup sized hidden"></div>
-  <div id="chatModal" class="modal modal-dropup-left sized hidden"></div>
-
-  <header class="profile-header">
-    <div class="profile-tabs">
-      <a href="index.html">Back to Hub</a>
-      <a href="#" class="active">Profile</a>
-      <a href="#">Checkout</a>
-      <a href="#">Stats</a>
-      <a href="#">Items</a>
+<body>
+  <header class="main-header">
+    <div class="logo-area">
+      <div class="logo-sumo">
+        <span class="logo-sumo-icon">相</span>
+      </div>
+      <div class="logo-text">
+        <h1>Sumo Showdown Hub</h1>
+        <p>Profile &amp; Fighters</p>
+      </div>
     </div>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="profile.html" class="nav-link active">Profile</a>
+      <a href="index.html#rules" class="nav-link">Rules</a>
+      <a href="index.html#leaderboardSection" class="nav-link">Leaderboard</a>
+    </nav>
   </header>
 
-  <main class="profile-main">
-    <section class="profile-hero">
-      <div class="avatar">
-        <div class="buddy"></div>
-      </div>
-      <div class="identity">
-        <h1 id="profileName">Your Player</h1>
-        <p>Edit your display name, avatar theme, and animation style.</p>
-        <label>Display name:
-          <input id="profileNameInput" value="Your Player" />
-        </label>
-        <label>Character style:
-          <select id="profileStyle">
-            <option value="enforcer">Blue Line Enforcer</option>
-            <option value="sniper">Top‑Shelf Sniper</option>
-            <option value="playmaker">Elite Playmaker</option>
-          </select>
-        </label>
-      </div>
-      <div class="level">
-        <div class="big" id="profileLevel">12</div>
-        <div>Level</div>
-        <label class="toggle">
-          <input type="checkbox" id="autoSpin" checked />
-          <span>Auto Turn</span>
-        </label>
-      </div>
-    </section>
+  <main class="page-content">
+    <section class="profile-layout">
+      <div class="card profile-main">
+        <div class="profile-header-row">
+          <h2>Your Sumo Identity</h2>
+          <button id="openSettings" class="secondary-btn">Settings</button>
+        </div>
 
-    <div class="xp-strip">
-      <span>XP Progress</span>
-      <div class="xp"><span style="width:65%"></span></div>
-      <span>65%</span>
-    </div>
+        <div class="profile-top">
+          <div class="avatar-column">
+            <div class="avatar-plate">
+              <div id="avatarPreview" class="avatar-sumo avatar-rank-1">
+                <div class="avatar-face"></div>
+                <div class="avatar-belt"></div>
+              </div>
+            </div>
+            <div class="character-selector">
+              <h3>Character Selector</h3>
+              <label>
+                Body type
+                <select id="bodyType">
+                  <option value="classic">Classic</option>
+                  <option value="giant">Giant</option>
+                  <option value="lean">Lean</option>
+                </select>
+              </label>
+              <label>
+                Mawashi color
+                <select id="beltColor">
+                  <option value="crimson">Crimson</option>
+                  <option value="gold">Gold</option>
+                  <option value="indigo">Indigo</option>
+                  <option value="onyx">Onyx</option>
+                </select>
+              </label>
+              <label>
+                Aura
+                <select id="auraStyle">
+                  <option value="none">None</option>
+                  <option value="mist">Rising Mist</option>
+                  <option value="sparks">Arena Sparks</option>
+                  <option value="flames">Ring of Flames</option>
+                </select>
+              </label>
+            </div>
+          </div>
 
-    <section class="totals">
-      <h2>Overview</h2>
-      <ul class="stats">
-        <li>Mini‑games played <b>128</b></li>
-        <li>Best Sumo Showdown streak <b id="bestStreak">7</b></li>
-        <li>Total tokens earned <b>34,250</b></li>
-      </ul>
+          <div class="info-column">
+            <div class="profile-field-set">
+              <h3>Account</h3>
+              <label>
+                Username (changeable once per week)
+                <input id="usernameInput" type="text" maxlength="64" />
+              </label>
+              <p class="hint" id="usernameHint"></p>
+            </div>
+
+            <div class="profile-field-set">
+              <h3>Display Name</h3>
+              <label>
+                Fighter name (used in game &amp; leaderboard)
+                <input id="displayNameInput" type="text" maxlength="64" />
+              </label>
+              <p class="hint">You can change this any time.</p>
+            </div>
+
+            <div class="profile-field-set">
+              <h3>Profile Summary</h3>
+              <div class="stat-line">
+                <span>Account level</span>
+                <span id="accountLevel">12</span>
+              </div>
+              <div class="stat-line">
+                <span>Best streak</span>
+                <span id="bestStreak">7</span>
+              </div>
+              <div class="stat-line">
+                <span>Total tokens earned</span>
+                <span id="totalTokens">34250</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-bottom">
+          <div class="profile-subcard">
+            <h3>Checkout Stats</h3>
+            <ul>
+              <li>Mini-games played: <span id="statGames">128</span></li>
+              <li>Average streak: <span id="statAvgStreak">3.4</span></li>
+              <li>Max daily tokens: <span id="statMaxTokens">2400</span></li>
+            </ul>
+          </div>
+          <div class="profile-subcard">
+            <h3>Items</h3>
+            <ul>
+              <li>Legendary mawashi: <span>Crimson Dragon Wrap</span></li>
+              <li>Arena banner: <span>Thunderstorm Dohyo</span></li>
+              <li>Entrance animation: <span>Rising Ember Steps</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <script src="main.js" defer></script>
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Profile Settings</h2>
+        <button id="closeSettings" class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-grid">
+          <div class="setting-item">
+            <h3>Themes</h3>
+            <label>
+              Site theme
+              <select id="themeSelect">
+                <option value="dark">Dohyo Night (Dark)</option>
+                <option value="light">Morning Basho (Light)</option>
+              </select>
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Notifications</h3>
+            <label>
+              <input type="checkbox" id="notifyStreaks" />
+              Notify me when I beat my best streak
+            </label>
+            <label>
+              <input type="checkbox" id="notifyEvents" />
+              Send special tournament alerts
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Visual</h3>
+            <label>
+              <input type="checkbox" id="reducedMotion" />
+              Reduce animations
+            </label>
+            <label>
+              <input type="checkbox" id="highContrast" />
+              High-contrast mode
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Audio</h3>
+            <label>
+              Master volume
+              <input type="range" id="masterVolume" min="0" max="100" />
+            </label>
+            <label>
+              SFX volume
+              <input type="range" id="sfxVolume" min="0" max="100" />
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Language</h3>
+            <select id="languageSelect">
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <h3>Privacy</h3>
+            <label>
+              <input type="checkbox" id="privacyProfilePublic" />
+              Make my profile public on leaderboards
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Data</h3>
+            <label>
+              <input type="checkbox" id="dataAnalytics" />
+              Allow anonymous analytics
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Tooltips</h3>
+            <label>
+              <input type="checkbox" id="showTooltips" checked />
+              Show helper tooltips
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Controls</h3>
+            <label>
+              <input type="checkbox" id="spaceToSpin" checked />
+              Press Space to spin in game
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Reset</h3>
+            <button id="resetProfile" class="danger-btn">
+              Reset profile locally
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveSettings" class="primary-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="visitors">
+        <div class="visitor-count">
+          <span class="label">Online now</span>
+          <span id="onlineVisitors" class="value">1</span>
+        </div>
+        <div class="visitor-count">
+          <span class="label">All-time visitors</span>
+          <span id="allTimeVisitors" class="value">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-grid">
+      <div class="footer-cell">
+        <a href="#privacy" class="footer-heading">Privacy Policy</a>
+        <a href="#cookies" class="footer-link">Cookies Policy</a>
+        <a href="#community" class="footer-link">Community Guidelines</a>
+      </div>
+      <div class="footer-cell">
+        <a href="#contact" class="footer-heading">Contact Us</a>
+        <a href="#help" class="footer-link">Help Center</a>
+        <a href="#faqs" class="footer-link">FAQs</a>
+      </div>
+      <div class="footer-cell">
+        <a href="#report" class="footer-heading">Report a Bug</a>
+        <a href="#about" class="footer-link">About Us</a>
+        <a href="#press" class="footer-link">Press Kit</a>
+      </div>
+      <div class="footer-cell">
+        <a href="#newsletter" class="footer-heading">Newsletter</a>
+        <a href="#playerOfMonth" class="footer-link">Player of the Month</a>
+      </div>
+      <div class="footer-cell">
+        <a href="#terms" class="footer-heading">Terms</a>
+        <a href="#safety" class="footer-link">Safety</a>
+      </div>
+      <div class="footer-cell">
+        <a href="#legal" class="footer-heading">Legal</a>
+        <a href="#cookies" class="footer-link">Cookie Choices</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 Sumo Showdown Hub. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
