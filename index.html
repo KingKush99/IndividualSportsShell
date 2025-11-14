@@ -14,7 +14,7 @@
       </div>
       <div class="logo-text">
         <h1>Sumo Showdown Hub</h1>
-        <p>Clash on the dohyo. Rule the reels.</p>
+        <p>Clash on the dohyo. Rule the ring.</p>
       </div>
     </div>
     <nav class="main-nav">
@@ -28,84 +28,80 @@
   <main class="page-content">
     <section class="hero">
       <div class="hero-copy">
-        <h2>Step into the Dohyo Casino</h2>
+        <h2>Step into the Dohyo</h2>
         <p>
-          Pick your sumo, slam the lever, and push to spin the reels.
-          Build streaks, climb the leaderboard, and become Yokozuna of the slots.
+          Control your sumo wrestler, time your charges, and push your opponent out of the ring.
+          Your fighter name and style come from your profile.
         </p>
       </div>
     </section>
 
     <section class="center-layout">
-      <div class="card tabs-card">
+      <div class="card arena-card">
         <div class="tabs-header">
-          <button class="tab-btn active" data-tab="gameView">Game</button>
+          <button class="tab-btn active" data-tab="gameView">Sumo Game</button>
           <button class="tab-btn" data-tab="leaderboardView">Leaderboard</button>
         </div>
 
-        <!-- GAME VIEW -->
+        <!-- SUMO GAME VIEW -->
         <div id="gameView" class="tab-view active">
-          <div class="game-wrapper">
-            <div class="player-banner">
-              <span class="label">Fighter:</span>
-              <span id="playerDisplayName" class="value">Guest Sumo</span>
-            </div>
-
-            <div class="slot-machine">
-              <div class="slot-cabinet">
-                <div class="slot-top">
-                  <span class="slot-title">Sumo Reel Rumble</span>
+          <section class="sumo-arena">
+            <div class="arena-top">
+              <div class="fighter-panel">
+                <h3>Your Sumo</h3>
+                <p class="fighter-name" id="playerName">Guest Sumo</p>
+                <div class="stat-bar">
+                  <span>Stamina</span>
+                  <div class="bar-outer">
+                    <div id="playerStaminaBar" class="bar-inner"></div>
+                  </div>
+                  <span id="playerStaminaValue" class="bar-value">100</span>
                 </div>
-
-                <div class="slot-body">
-                  <div class="lever-area">
-                    <div class="lever-base">
-                      <div class="lever-stick"></div>
-                      <div class="lever-ball"></div>
-                    </div>
+                <div class="stat-bar">
+                  <span>Balance</span>
+                  <div class="bar-outer">
+                    <div id="playerBalanceBar" class="bar-inner bar-secondary"></div>
                   </div>
-
-                  <div class="reels-area">
-                    <div class="dohyo-frame">
-                      <div class="reels-grid" id="reelsGrid">
-                        <!-- Filled by JS -->
-                      </div>
-                    </div>
-
-                    <div class="controls-row">
-                      <div class="bet-control dropup">
-                        <button id="betToggle" class="bet-toggle">Bet: <span id="betValue">10</span></button>
-                        <ul id="betMenu" class="bet-menu">
-                          <li data-bet="10">10</li>
-                          <li data-bet="25">25</li>
-                          <li data-bet="50">50</li>
-                          <li data-bet="100">100</li>
-                        </ul>
-                      </div>
-
-                      <button id="pushSpin" class="push-button">
-                        <span>Push to Spin</span>
-                      </button>
-                    </div>
-                  </div>
+                  <span id="playerBalanceValue" class="bar-value">100</span>
                 </div>
-
-                <div class="slot-bottom">
-                  <div class="meters">
-                    <div class="meter">
-                      <span class="label">Streak</span>
-                      <span id="streakValue" class="value">0</span>
-                    </div>
-                    <div class="meter">
-                      <span class="label">Tokens</span>
-                      <span id="tokenValue" class="value">1000</span>
-                    </div>
+              </div>
+              <div class="dohyo-visual">
+                <div class="dohyo-circle">
+                  <div class="sumo-token sumo-left" id="playerToken"></div>
+                  <div class="sumo-token sumo-right" id="cpuToken"></div>
+                </div>
+                <p id="roundMessage" class="round-message">
+                  Press "Charge" to clash!
+                </p>
+              </div>
+              <div class="fighter-panel">
+                <h3>CPU Sumo</h3>
+                <p class="fighter-name">Iron Mawashi</p>
+                <div class="stat-bar">
+                  <span>Stamina</span>
+                  <div class="bar-outer">
+                    <div id="cpuStaminaBar" class="bar-inner"></div>
                   </div>
+                  <span id="cpuStaminaValue" class="bar-value">100</span>
+                </div>
+                <div class="stat-bar">
+                  <span>Balance</span>
+                  <div class="bar-outer">
+                    <div id="cpuBalanceBar" class="bar-inner bar-secondary"></div>
+                  </div>
+                  <span id="cpuBalanceValue" class="bar-value">100</span>
                 </div>
               </div>
             </div>
 
-          </div>
+            <div class="arena-controls">
+              <button id="chargeButton" class="primary-btn large">Charge</button>
+              <button id="resetMatchButton" class="secondary-btn">New Bout</button>
+              <p class="hint">
+                Tip: your balance changes every time you charge. High balance means stronger pushes.
+              </p>
+            </div>
+          </section>
         </div>
 
         <!-- LEADERBOARD VIEW -->
@@ -113,18 +109,17 @@
           <section id="leaderboardSection" class="leaderboard-section">
             <h2>Leaderboard</h2>
             <p class="lb-subtitle">
-              Rankings are based on highest streak achieved in Sumo Reel Rumble.
+              Rankings are based on wins and fastest bouts.
             </p>
             <table class="leaderboard-table">
               <thead>
                 <tr>
                   <th>Rank</th>
                   <th>Fighter</th>
-                  <th>Best Streak</th>
+                  <th>Wins</th>
                 </tr>
               </thead>
               <tbody id="leaderboardBody">
-                <!-- Filled by JS -->
               </tbody>
             </table>
           </section>
@@ -133,17 +128,53 @@
     </section>
 
     <section id="rules" class="rules-section">
-      <h2>How to Play Sumo Reel Rumble</h2>
+      <h2>How to Play Sumo Showdown</h2>
       <ol>
-        <li>Set your bet using the drop-up control below the reels.</li>
-        <li>Grab the lever on the right with your eyes, then press the red push button to spin.</li>
-        <li>Three matching sumo icons across any row is a win and adds to your streak.</li>
-        <li>Higher-ranked sumo fighters pay more, but appear less often.</li>
-        <li>Breaking your streak resets it to zero, so choose your bets wisely.</li>
-        <li>Your fighter name comes from your Profile display name.</li>
+        <li>Configure your fighter’s look and name in the Profile screen.</li>
+        <li>In each bout, both you and the CPU start with full stamina and balance.</li>
+        <li>Press Charge to clash; your push power depends on your current balance.</li>
+        <li>The weaker wrestler loses more stamina and slides closer to the ring edge.</li>
+        <li>When a wrestler’s stamina hits 0, they’re pushed out of the dohyo and lose the bout.</li>
+        <li>Wins and fast knockouts contribute to your leaderboard ranking.</li>
       </ol>
     </section>
   </main>
+
+  <!-- MINI-SLOTS FLOATING DROP-UP -->
+  <button id="miniTrigger" class="mini-trigger" aria-label="Open mini-slots">
+    🎰
+  </button>
+  <div id="miniPanel" class="mini-panel">
+    <div class="mini-header">
+      <span>Sumo Reel Mini-Slots</span>
+      <button id="miniClose" class="mini-close">×</button>
+    </div>
+    <div class="mini-body">
+      <div class="mini-reels" id="miniReelsGrid"></div>
+      <div class="mini-controls">
+        <button id="miniBetToggle" class="mini-bet-btn">
+          Bet: <span id="miniBetValue">5</span>
+        </button>
+        <ul id="miniBetMenu" class="mini-bet-menu">
+          <li data-bet="5">5</li>
+          <li data-bet="10">10</li>
+          <li data-bet="20">20</li>
+          <li data-bet="50">50</li>
+        </ul>
+        <button id="miniPushSpin" class="mini-spin-btn">Push</button>
+      </div>
+      <div class="mini-meters">
+        <div class="mini-meter">
+          <span>Streak</span>
+          <span id="miniStreakValue">0</span>
+        </div>
+        <div class="mini-meter">
+          <span>Tokens</span>
+          <span id="miniTokenValue">250</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <div class="footer-top">
