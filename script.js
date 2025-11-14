@@ -15,7 +15,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ========== SIMPLE PROFILE NAME HOOKS ==========
-// Assumes your profile.html will set these localStorage keys.
 function getDisplayName() {
   return localStorage.getItem("displayName") || "You";
 }
@@ -61,16 +60,13 @@ function setupSubtabs() {
 
 // ========== CORNER UI ==========
 function setupCornerUI() {
-  // Profile button -> go to profile page
   const profileButton = document.getElementById("profileButton");
   if (profileButton) {
     profileButton.addEventListener("click", () => {
-      // Replace with your exact profile path if needed
       window.location.href = "profile.html";
     });
   }
 
-  // Hamburger menu
   const menuButton = document.getElementById("menuButton");
   const menuDropdown = document.getElementById("menuDropdown");
   if (menuButton && menuDropdown) {
@@ -78,16 +74,12 @@ function setupCornerUI() {
       menuDropdown.classList.toggle("hidden");
     });
     document.addEventListener("click", (e) => {
-      if (
-        !menuButton.contains(e.target) &&
-        !menuDropdown.contains(e.target)
-      ) {
+      if (!menuButton.contains(e.target) && !menuDropdown.contains(e.target)) {
         menuDropdown.classList.add("hidden");
       }
     });
   }
 
-  // Chatbot toggle
   const chatbotButton = document.getElementById("chatbotButton");
   const chatbotPanel = document.getElementById("chatbotPanel");
   if (chatbotButton && chatbotPanel) {
@@ -96,7 +88,6 @@ function setupCornerUI() {
     });
   }
 
-  // Mini-slots toggle
   const miniSlotsButton = document.getElementById("miniSlotsButton");
   const miniSlotsPanel = document.getElementById("miniSlotsPanel");
   if (miniSlotsButton && miniSlotsPanel) {
@@ -122,11 +113,10 @@ function setupChatbot() {
   }
 
   function replyToUser(msg) {
-    // Simple canned reply to keep it light
     const lower = msg.toLowerCase();
     if (lower.includes("control") || lower.includes("how")) {
       addMessage(
-        "Use ← / → or A / D to move and Space to charge. Push the opponent out of the ring!",
+        "Use ← / → / ↑ / ↓ or W/A/S/D to walk and Space to charge. Push the opponent out of the ring!",
         "bot"
       );
     } else if (lower.includes("こんにちは") || lower.includes("konnichiwa")) {
@@ -233,11 +223,14 @@ function initSumoGame() {
   hpPlayerEl = document.getElementById("hpPlayer");
   hpCpuEl = document.getElementById("hpCpu");
 
-  // Initialize fighters
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2 + 40;
+
   sumoState.player = {
-    x: canvas.width / 2 - 90,
-    y: canvas.height / 2 + 40,
+    x: cx - 90,
+    y: cy,
     vx: 0,
+    vy: 0,
     facing: 1,
     stamina: 100,
     anim: "idle",
@@ -246,9 +239,10 @@ function initSumoGame() {
   };
 
   sumoState.cpu = {
-    x: canvas.width / 2 + 90,
-    y: canvas.height / 2 + 40,
+    x: cx + 90,
+    y: cy,
     vx: 0,
+    vy: 0,
     facing: -1,
     stamina: 100,
     anim: "idle",
@@ -258,32 +252,33 @@ function initSumoGame() {
   };
 
   sumoState.ref = {
+    x: cx,
+    y: cy - 30,
     phase: 0,
   };
 
-  // Create full-body spectators
+  // Circular stands crowd
   sumoState.crowd = [];
-  const count = 40;
-  for (let i = 0; i < count; i++) {
-    const x = 60 + Math.random() * (canvas.width - 120);
-    const yBase = 80 + Math.random() * 80;
+  const ringR = sumoState.ringRadius;
+  const innerStandR = ringR + 40;
+  const outerStandR = ringR + 80;
+  const fanCount = 48;
+  for (let i = 0; i < fanCount; i++) {
+    const angle = (i / fanCount) * Math.PI * 2;
+    const r = innerStandR + Math.random() * (outerStandR - innerStandR);
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * (r * 0.55); // squash vertically for perspective
     sumoState.crowd.push({
       x,
-      yBase,
-      amp: 3 + Math.random() * 4,
+      yBase: y,
+      amp: 4 + Math.random() * 4,
       phase: Math.random() * Math.PI * 2,
-      bodyColor: randomChoice([
-        "#e74c3c",
-        "#3498db",
-        "#9b59b6",
-        "#1abc9c",
-        "#f1c40f",
-      ]),
-      height: 34 + Math.random() * 14,
+      shirtColor: randomChoice(["#e74c3c", "#3498db", "#9b59b6", "#1abc9c", "#f1c40f"]),
+      pantColor: randomChoice(["#2c3e50", "#34495e", "#1f2a3a"]),
+      height: 32 + Math.random() * 10,
     });
   }
 
-  // Input setup
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     sumoState.keys[key] = true;
@@ -309,17 +304,22 @@ function setGameMessage(text) {
 
 function resetBout() {
   const { player, cpu } = sumoState;
-  if (!player || !cpu) return;
+  if (!player || !cpu || !canvas) return;
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2 + 40;
 
-  player.x = canvas.width / 2 - 90;
-  cpu.x = canvas.width / 2 + 90;
+  player.x = cx - 90;
+  player.y = cy;
+  cpu.x = cx + 90;
+  cpu.y = cy;
   player.stamina = 100;
   cpu.stamina = 100;
   player.vx = cpu.vx = 0;
+  player.vy = cpu.vy = 0;
   player.anim = cpu.anim = "idle";
   player.pushCooldown = cpu.pushCooldown = 0;
   sumoState.boutOver = false;
-  setGameMessage("Move with ← → or A / D, Space to charge. Push opponent out of the ring!");
+  setGameMessage("Move with ← → / ↑ ↓ or W/A/S/D, Space to charge. Push opponent out of the ring!");
 }
 
 // ========== GAME LOOP ==========
@@ -349,7 +349,6 @@ function updateGame(dt) {
     handlePhysics(player, cpu, dt);
   }
 
-  // Cooldowns
   player.pushCooldown = Math.max(0, player.pushCooldown - dt);
   cpu.pushCooldown = Math.max(0, cpu.pushCooldown - dt);
 
@@ -358,16 +357,25 @@ function updateGame(dt) {
 
 function handlePlayerInput(p, dt) {
   const speed = 180;
-  let dir = 0;
-  if (sumoState.keys["arrowleft"] || sumoState.keys["a"]) dir -= 1;
-  if (sumoState.keys["arrowright"] || sumoState.keys["d"]) dir += 1;
+  let dx = 0;
+  let dy = 0;
 
-  if (dir !== 0) {
-    p.vx = dir * speed;
-    p.facing = dir > 0 ? 1 : -1;
+  if (sumoState.keys["arrowleft"] || sumoState.keys["a"]) dx -= 1;
+  if (sumoState.keys["arrowright"] || sumoState.keys["d"]) dx += 1;
+  if (sumoState.keys["arrowup"] || sumoState.keys["w"]) dy -= 1;
+  if (sumoState.keys["arrowdown"] || sumoState.keys["s"]) dy += 1;
+
+  if (dx !== 0 || dy !== 0) {
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len;
+    dy /= len;
+    p.vx = dx * speed;
+    p.vy = dy * speed;
+    if (dx !== 0) p.facing = dx > 0 ? 1 : -1;
     if (p.anim === "idle") p.anim = "walk";
   } else {
     p.vx = 0;
+    p.vy = 0;
     if (p.anim === "walk") p.anim = "idle";
   }
 
@@ -381,23 +389,38 @@ function handlePlayerInput(p, dt) {
 function handleCpuAI(c, dt, player) {
   c.aiTimer -= dt;
   const speed = 160;
-  let targetX = canvas.width / 2 + 60;
 
-  if (Math.abs(c.x - player.x) > 110) {
-    targetX = player.x + 70;
+  let targetX = player.x;
+  let targetY = player.y;
+
+  const dist = Math.hypot(targetX - c.x, targetY - c.y);
+
+  if (dist > 150) {
+    const dx = targetX - c.x;
+    const dy = targetY - c.y;
+    const len = Math.hypot(dx, dy) || 1;
+    c.vx = (dx / len) * speed;
+    c.vy = (dy / len) * speed;
+  } else if (dist < 120) {
+    const dx = c.x - targetX;
+    const dy = c.y - targetY;
+    const len = Math.hypot(dx, dy) || 1;
+    c.vx = (dx / len) * speed * 0.3;
+    c.vy = (dy / len) * speed * 0.3;
+  } else {
+    c.vx = 0;
+    c.vy = 0;
   }
 
-  const dir = Math.sign(targetX - c.x);
-  c.vx = dir * speed;
-  c.facing = dir > 0 ? 1 : -1;
-  if (c.vx !== 0) {
+  if (c.vx !== 0) c.facing = c.vx > 0 ? 1 : -1;
+  if (c.vx !== 0 || c.vy !== 0) {
     if (c.anim === "idle") c.anim = "walk";
   } else if (c.anim === "walk") {
     c.anim = "idle";
   }
 
   if (c.aiTimer <= 0 && c.pushCooldown <= 0) {
-    if (Math.abs(c.x - player.x) < 200) {
+    if (dist < 220) {
       c.anim = "charge";
       attemptClash(true);
       c.pushCooldown = 0.5;
@@ -409,27 +432,42 @@ function handleCpuAI(c, dt, player) {
 }
 
 function handlePhysics(p, c, dt) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2 + 40;
+  const maxR = sumoState.ringRadius - 20;
+
   p.x += p.vx * dt;
+  p.y += p.vy * dt;
   c.x += c.vx * dt;
+  c.y += c.vy * dt;
 
-  const centerX = canvas.width / 2;
-  const maxOffset = sumoState.ringRadius - 30;
+  // clamp inside ring
+  let pr = Math.hypot(p.x - cx, p.y - cy);
+  if (pr > maxR) {
+    const ratio = maxR / pr;
+    p.x = cx + (p.x - cx) * ratio;
+    p.y = cy + (p.y - cy) * ratio;
+  }
 
-  p.x = Math.min(centerX + maxOffset, Math.max(centerX - maxOffset, p.x));
-  c.x = Math.min(centerX + maxOffset, Math.max(centerX - maxOffset, c.x));
+  let cr = Math.hypot(c.x - cx, c.y - cy);
+  if (cr > maxR) {
+    const ratio = maxR / cr;
+    c.x = cx + (c.x - cx) * ratio;
+    c.y = cy + (c.y - cy) * ratio;
+  }
 
-  // Check ring-out
+  // check ring-out
   if (!sumoState.boutOver) {
-    const pOff = Math.abs(p.x - centerX);
-    const cOff = Math.abs(c.x - centerX);
-    if (p.stamina <= 0 || pOff > maxOffset + 5) {
+    const pOff = Math.hypot(p.x - cx, p.y - cy);
+    const cOff = Math.hypot(c.x - cx, c.y - cy);
+    const margin = 10;
+    if (p.stamina <= 0 || pOff > maxR + margin) {
       endBout("cpu");
-    } else if (c.stamina <= 0 || cOff > maxOffset + 5) {
+    } else if (c.stamina <= 0 || cOff > maxR + margin) {
       endBout("player");
     }
   }
 
-  // Push effect animation
   if (sumoState.pushEffect.active) {
     sumoState.pushEffect.scale += dt * 2.2;
     if (sumoState.pushEffect.scale > 1.5) {
@@ -440,15 +478,14 @@ function handlePhysics(p, c, dt) {
 
 function attemptClash(cpuInitiated) {
   const { player, cpu } = sumoState;
-  if (sumoState.boutOver) return;
+  if (sumoState.boutOver || !canvas) return;
 
-  const dist = Math.abs(player.x - cpu.x);
-  if (dist > 190) return; // too far, whiff
+  const dist = Math.hypot(player.x - cpu.x, player.y - cpu.y);
+  if (dist > 190) return;
 
-  // Visual effect
   sumoState.pushEffect.active = true;
   sumoState.pushEffect.x = (player.x + cpu.x) / 2;
-  sumoState.pushEffect.y = canvas.height / 2 + 40;
+  sumoState.pushEffect.y = (player.y + cpu.y) / 2;
   sumoState.pushEffect.scale = 0.3;
 
   const base = 15 + Math.random() * 20;
@@ -465,15 +502,18 @@ function attemptClash(cpuInitiated) {
     diff = cpuRoll - playerRoll;
   }
 
-  const push = diff * 1.2;
+  const push = diff * 1.4;
+  const angle = Math.atan2(cpu.y - player.y, cpu.x - player.x);
 
   if (winner === "player") {
-    cpu.x += Math.sign(cpu.x - player.x) * push;
+    cpu.x += Math.cos(angle) * push;
+    cpu.y += Math.sin(angle) * push;
     cpu.stamina -= diff * 1.2;
     setGameMessage("You drive the opponent back!");
     player.anim = "push";
   } else {
-    player.x += Math.sign(player.x - cpu.x) * push;
+    player.x -= Math.cos(angle) * push;
+    player.y -= Math.sin(angle) * push;
     player.stamina -= diff * 1.2;
     setGameMessage("You are forced toward the edge!");
     cpu.anim = "push";
@@ -487,10 +527,7 @@ function endBout(winner) {
   if (winner === "player") {
     stats.wins = (stats.wins || 0) + 1;
     stats.currentStreak = (stats.currentStreak || 0) + 1;
-    stats.bestStreak = Math.max(
-      stats.bestStreak || 0,
-      stats.currentStreak || 0
-    );
+    stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak || 0);
     setGameMessage("You win! Click the ring to start a new bout.");
   } else {
     stats.currentStreak = 0;
@@ -507,6 +544,7 @@ function drawGame() {
   const { player, cpu } = sumoState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  drawStands();
   drawCrowd();
   drawDohyo();
   drawReferee();
@@ -515,33 +553,97 @@ function drawGame() {
   drawPushCircle();
 }
 
+function drawStands() {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2 + 40;
+  const rOuter = sumoState.ringRadius + 90;
+  const rMid = sumoState.ringRadius + 60;
+
+  const grd = ctx.createRadialGradient(cx, cy - 60, 40, cx, cy - 40, rOuter);
+  grd.addColorStop(0, "#1f2536");
+  grd.addColorStop(1, "#05060b");
+  ctx.fillStyle = grd;
+
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 20, rOuter, rOuter * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#20263a";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 10, rMid, rMid * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function drawCrowd() {
   const t = sumoState.time;
   const crowd = sumoState.crowd;
-  for (const s of crowd) {
-    const y = s.yBase + Math.sin(t * 2 + s.phase) * s.amp;
-    const h = s.height;
-    const x = s.x;
+  for (const f of crowd) {
+    const y = f.yBase + Math.sin(t * 2 + f.phase) * f.amp;
+    const h = f.height;
+    const x = f.x;
+
+    const torsoHeight = h * 0.45;
+    const legHeight = h * 0.35;
+    const headRadius = h * 0.2;
+    const torsoTop = y - torsoHeight;
+    const headCenterY = torsoTop - headRadius - 2;
 
     // legs
-    ctx.fillStyle = "#111";
-    ctx.fillRect(x + 2, y + h - 6, 6, 6);
-    ctx.fillRect(x + 12, y + h - 6, 6, 6);
+    ctx.fillStyle = f.pantColor;
+    const legWidth = 6;
+    ctx.fillRect(x - legWidth - 3, y - legHeight, legWidth, legHeight);
+    ctx.fillRect(x + 3, y - legHeight, legWidth, legHeight);
 
-    // body
-    ctx.fillStyle = s.bodyColor;
-    ctx.fillRect(x, y + 6, 20, h - 12);
+    // feet
+    ctx.fillStyle = "#111";
+    ctx.fillRect(x - legWidth - 4, y - 4, legWidth + 2, 4);
+    ctx.fillRect(x + 2, y - 4, legWidth + 2, 4);
+
+    // torso
+    ctx.fillStyle = f.shirtColor;
+    ctx.fillRect(x - 9, torsoTop, 18, torsoHeight);
+
+    // arms
+    ctx.fillStyle = "#f3d5b5";
+    ctx.fillRect(x - 15, torsoTop + 4, 6, torsoHeight - 6);
+    ctx.fillRect(x + 9, torsoTop + 4, 6, torsoHeight - 6);
+
+    // hands
+    ctx.beginPath();
+    ctx.arc(x - 12, torsoTop + torsoHeight, 3, 0, Math.PI * 2);
+    ctx.arc(x + 12, torsoTop + torsoHeight, 3, 0, Math.PI * 2);
+    ctx.fill();
 
     // head
     ctx.fillStyle = "#f3d5b5";
     ctx.beginPath();
-    ctx.arc(x + 10, y, 8, 0, Math.PI * 2);
+    ctx.arc(x, headCenterY, headRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // simple face
+    // hair
+    ctx.fillStyle = "#2c2b30";
+    ctx.beginPath();
+    ctx.arc(x, headCenterY - headRadius * 0.3, headRadius, Math.PI, 0);
+    ctx.fill();
+
+    // ears
+    ctx.beginPath();
+    ctx.arc(x - headRadius, headCenterY, headRadius * 0.35, 0, Math.PI * 2);
+    ctx.arc(x + headRadius, headCenterY, headRadius * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+
+    // face
     ctx.fillStyle = "#000";
-    ctx.fillRect(x + 7, y - 3, 2, 2); // left eye
-    ctx.fillRect(x + 11, y - 3, 2, 2); // right eye
+    ctx.beginPath();
+    ctx.arc(x - headRadius * 0.4, headCenterY - 2, 1.4, 0, Math.PI * 2);
+    ctx.arc(x + headRadius * 0.4, headCenterY - 2, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#b03030";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(x, headCenterY + 2, headRadius * 0.5, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
   }
 }
 
@@ -551,7 +653,6 @@ function drawDohyo() {
   const rOuter = sumoState.ringRadius + 20;
   const rInner = sumoState.ringRadius;
 
-  // base
   const grd = ctx.createRadialGradient(cx, cy, 20, cx, cy, rOuter);
   grd.addColorStop(0, "#cfa36a");
   grd.addColorStop(1, "#7f5b2f");
@@ -560,57 +661,105 @@ function drawDohyo() {
   ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
   ctx.fill();
 
-  // circle ring
   ctx.strokeStyle = "#f8e0b0";
   ctx.lineWidth = 12;
   ctx.beginPath();
   ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
   ctx.stroke();
 
-  // starting lines
   ctx.fillStyle = "#f8e8d0";
   ctx.fillRect(cx - 60, cy - 4, 40, 8);
   ctx.fillRect(cx + 20, cy - 4, 40, 8);
 }
 
 function drawReferee() {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 - 10;
+  const ref = sumoState.ref;
   const t = sumoState.time;
   const bob = Math.sin(t * 3) * 2;
 
-  // body (red kimono)
+  const x = ref.x;
+  const y = ref.y + bob;
+
+  // legs
+  ctx.fillStyle = "#2c3e50";
+  ctx.fillRect(x - 7, y + 30, 6, 20);
+  ctx.fillRect(x + 1, y + 30, 6, 20);
+
+  ctx.fillStyle = "#111";
+  ctx.fillRect(x - 8, y + 48, 8, 4);
+  ctx.fillRect(x + 1, y + 48, 8, 4);
+
+  // torso (kimono)
   ctx.fillStyle = "#b83232";
-  ctx.fillRect(cx - 14, cy - 4 + bob, 28, 36);
+  ctx.fillRect(x - 12, y, 24, 34);
+
+  // arms
+  ctx.fillStyle = "#f1d2aa";
+  ctx.fillRect(x - 18, y + 4, 6, 22);
+  ctx.fillRect(x + 12, y + 4, 6, 22);
+
+  // hands
+  ctx.beginPath();
+  ctx.arc(x - 15, y + 26, 3, 0, Math.PI * 2);
+  ctx.arc(x + 15, y + 26, 3, 0, Math.PI * 2);
+  ctx.fill();
 
   // head
   ctx.fillStyle = "#f1d2aa";
   ctx.beginPath();
-  ctx.arc(cx, cy - 18 + bob, 12, 0, Math.PI * 2);
+  ctx.arc(x, y - 18, 12, 0, Math.PI * 2);
   ctx.fill();
 
-  // hat
+  // ears
+  ctx.beginPath();
+  ctx.arc(x - 12, y - 18, 3, 0, Math.PI * 2);
+  ctx.arc(x + 12, y - 18, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // hair hat
   ctx.fillStyle = "#11131a";
   ctx.beginPath();
-  ctx.moveTo(cx - 14, cy - 26 + bob);
-  ctx.lineTo(cx + 14, cy - 26 + bob);
-  ctx.lineTo(cx, cy - 46 + bob);
+  ctx.moveTo(x - 14, y - 26);
+  ctx.lineTo(x + 14, y - 26);
+  ctx.lineTo(x, y - 44);
   ctx.closePath();
   ctx.fill();
 
-  // arm (waving)
-  ctx.strokeStyle = "#f1d2aa";
-  ctx.lineWidth = 4;
+  // face
+  ctx.fillStyle = "#000";
   ctx.beginPath();
-  const armAngle = Math.sin(t * 4) * 0.5;
-  const ax1 = cx + 14;
-  const ay1 = cy + 4 + bob;
+  ctx.arc(x - 4, y - 20, 2, 0, Math.PI * 2);
+  ctx.arc(x + 4, y - 20, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#a03030";
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(x, y - 14, 5, 0.1 * Math.PI, 0.9 * Math.PI);
+  ctx.stroke();
+
+  // waving flag arm
+  ctx.strokeStyle = "#f1d2aa";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  const armAngle = Math.sin(t * 4) * 0.7;
+  const ax1 = x + 15;
+  const ay1 = y + 12;
   const armLen = 22;
   const ax2 = ax1 + armLen * Math.cos(armAngle);
   const ay2 = ay1 + armLen * Math.sin(armAngle);
   ctx.moveTo(ax1, ay1);
   ctx.lineTo(ax2, ay2);
   ctx.stroke();
+
+  // little flag
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.moveTo(ax2, ay2);
+  ctx.lineTo(ax2 + 8, ay2 - 4);
+  ctx.lineTo(ax2 + 8, ay2 + 4);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawFighter(f, beltColor, isPlayer) {
@@ -621,56 +770,41 @@ function drawFighter(f, beltColor, isPlayer) {
 
   const facing = f.facing || 1;
   ctx.save();
-  ctx.translate(cx, cy);
+  ctx.translate(cx, cy + wobble);
   if (facing < 0) ctx.scale(-1, 1);
-  ctx.translate(0, wobble);
 
-  // Body
+  // Scale for full body
+  const bodyWidth = 36;
+  const bodyHeight = 42;
+  const legHeight = 24;
+  const headRadius = 18;
+
+  // legs
+  ctx.fillStyle = "#f3d0a0";
+  ctx.fillRect(-bodyWidth * 0.4, 20, 10, legHeight);
+  ctx.fillRect(bodyWidth * 0.1, 20, 10, legHeight);
+
+  // feet
+  ctx.fillStyle = "#111";
+  ctx.fillRect(-bodyWidth * 0.42, 20 + legHeight, 14, 5);
+  ctx.fillRect(bodyWidth * 0.08, 20 + legHeight, 14, 5);
+
+  // torso
   ctx.fillStyle = "#f3d0a0";
   ctx.beginPath();
-  ctx.ellipse(0, 30, 40, 45, 0, 0, Math.PI * 2);
+  ctx.moveTo(-bodyWidth * 0.5, -4);
+  ctx.lineTo(bodyWidth * 0.5, -4);
+  ctx.quadraticCurveTo(bodyWidth * 0.7, 20, bodyWidth * 0.4, 32);
+  ctx.lineTo(-bodyWidth * 0.4, 32);
+  ctx.quadraticCurveTo(-bodyWidth * 0.7, 20, -bodyWidth * 0.5, -4);
+  ctx.closePath();
   ctx.fill();
 
-  // Belt
+  // belt / mawashi
   ctx.fillStyle = beltColor;
-  ctx.fillRect(-44, 40, 88, 18);
+  ctx.fillRect(-bodyWidth * 0.6, 10, bodyWidth * 1.2, 14);
 
-  // Head
-  ctx.fillStyle = "#f3d0a0";
-  ctx.beginPath();
-  ctx.arc(0, -10, 26, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Hair (top knot) using arc for compatibility
-  ctx.save();
-  ctx.fillStyle = "#1b1411";
-  ctx.beginPath();
-  ctx.arc(0, -26, 10, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // Eyes
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(-8, -12, 3, 0, Math.PI * 2);
-  ctx.arc(8, -12, 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Mouth (expression changes slightly based on stamina)
-  const tired = f.stamina < 35;
-  ctx.strokeStyle = "#a03030";
-  ctx.lineWidth = tired ? 3 : 2;
-  ctx.beginPath();
-  if (isPlayer) {
-    // Player mouth slight smile / grit
-    ctx.arc(0, -2, tired ? 8 : 10, 0.1 * Math.PI, 0.9 * Math.PI);
-  } else {
-    // CPU mouth
-    ctx.arc(0, -2, tired ? 8 : 10, 1.1 * Math.PI, 1.9 * Math.PI);
-  }
-  ctx.stroke();
-
-  // Arms
+  // arms
   ctx.fillStyle = "#f3d0a0";
   let armRaise = 0;
   if (f.anim === "charge" || f.anim === "push") {
@@ -679,10 +813,50 @@ function drawFighter(f, beltColor, isPlayer) {
     armRaise = Math.sin(t * 8 + f.phase) * 6;
   }
 
-  // Left arm
-  ctx.fillRect(-44, 10 + armRaise, 12, 28);
-  // Right arm
-  ctx.fillRect(32, 10 + armRaise, 12, 28);
+  ctx.fillRect(-bodyWidth * 0.8, 0 + armRaise, 10, 24);
+  ctx.fillRect(bodyWidth * 0.7, 0 + armRaise, 10, 24);
+
+  // hands
+  ctx.beginPath();
+  ctx.arc(-bodyWidth * 0.75 + 5, 24 + armRaise, 5, 0, Math.PI * 2);
+  ctx.arc(bodyWidth * 0.75 + 5, 24 + armRaise, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // head
+  ctx.fillStyle = "#f3d0a0";
+  ctx.beginPath();
+  ctx.arc(0, -20, headRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ears
+  ctx.beginPath();
+  ctx.arc(-headRadius, -20, 4, 0, Math.PI * 2);
+  ctx.arc(headRadius, -20, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // top knot hair
+  ctx.fillStyle = "#1b1411";
+  ctx.beginPath();
+  ctx.arc(0, -32, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  // face
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(-6, -22, 2.2, 0, Math.PI * 2);
+  ctx.arc(6, -22, 2.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  const tired = f.stamina < 35;
+  ctx.strokeStyle = "#a03030";
+  ctx.lineWidth = tired ? 3 : 2;
+  ctx.beginPath();
+  if (isPlayer) {
+    ctx.arc(0, -16, tired ? 6 : 8, 0.1 * Math.PI, 0.9 * Math.PI);
+  } else {
+    ctx.arc(0, -16, tired ? 6 : 8, 1.1 * Math.PI, 1.9 * Math.PI);
+  }
+  ctx.stroke();
 
   ctx.restore();
 }
