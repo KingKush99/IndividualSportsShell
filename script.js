@@ -628,7 +628,7 @@ function drawFighter(f, beltColor, isPlayer) {
   // Body
   ctx.fillStyle = "#f3d0a0";
   ctx.beginPath();
-  ctx.ellipse(0, 30, 40, 45, 0, Math.PI * 2);
+  ctx.ellipse(0, 30, 40, 45, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Belt
@@ -641,11 +641,13 @@ function drawFighter(f, beltColor, isPlayer) {
   ctx.arc(0, -10, 26, 0, Math.PI * 2);
   ctx.fill();
 
-  // Hair (top knot)
+  // Hair (top knot) using arc for compatibility
+  ctx.save();
   ctx.fillStyle = "#1b1411";
   ctx.beginPath();
-  ctx.ellipse(0, -26, 16, 10, 0, 0, Math.PI * 2);
+  ctx.arc(0, -26, 10, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
 
   // Eyes
   ctx.fillStyle = "#000";

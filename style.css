@@ -39,7 +39,7 @@ body {
   left: 12px;
 }
 
-corner-top-right {
+.corner-top-right {
   top: 12px;
   right: 12px;
 }
