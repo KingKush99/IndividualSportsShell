@@ -24,6 +24,24 @@ function setupTabs() {
   });
 }
 
+// ----- HAMBURGER MENU -----
+function setupHamburger() {
+  const wrapper = document.querySelector('.hamburger-wrapper');
+  const btn = $('#hamburgerBtn');
+  if (!wrapper || !btn) return;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    wrapper.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) {
+      wrapper.classList.remove('open');
+    }
+  });
+}
+
 // ----- SUMO GAME -----
 let playerStamina = 100;
 let cpuStamina = 100;
@@ -38,10 +56,6 @@ function resetBout() {
   updateBars();
   const msg = $('#roundMessage');
   if (msg) msg.textContent = 'Press "Charge" to clash!';
-  const playerToken = $('#playerToken');
-  const cpuToken = $('#cpuToken');
-  if (playerToken) playerToken.style.left = '35%';
-  if (cpuToken) cpuToken.style.left = '65%';
 }
 
 function updateBars() {
@@ -76,25 +90,15 @@ function performCharge() {
   const cPower = cpuBalance * (0.7 + Math.random() * 0.6);
 
   let message = '';
-  const playerToken = $('#playerToken');
-  const cpuToken = $('#cpuToken');
 
   if (pPower > cPower) {
     const diff = (pPower - cPower) / 20;
     cpuStamina -= diff * 8;
     message = 'You drove your opponent back!';
-    if (cpuToken) {
-      const current = parseFloat(cpuToken.style.left || '65');
-      cpuToken.style.left = Math.min(80, current + diff) + '%';
-    }
   } else if (cPower > pPower) {
     const diff = (cPower - pPower) / 20;
     playerStamina -= diff * 8;
     message = 'You get pushed toward the edge!';
-    if (playerToken) {
-      const current = parseFloat(playerToken.style.left || '35');
-      playerToken.style.left = Math.max(20, current - diff) + '%';
-    }
   } else {
     message = 'Even clash! No one moves.';
   }
@@ -129,11 +133,10 @@ function setupSumoGame() {
     resetButton.addEventListener('click', resetBout);
   }
 
-  const spaceToggle = $('#spaceToCharge');
   document.addEventListener('keydown', (e) => {
+    const spaceToggle = $('#spaceToCharge');
     const allowed = !spaceToggle || spaceToggle.checked;
     if (e.code === 'Space' && allowed) {
-      // Only trigger when on home page with game
       if ($('#gameView') && $('#gameView').classList.contains('active')) {
         e.preventDefault();
         performCharge();
@@ -145,7 +148,6 @@ function setupSumoGame() {
 }
 
 // ----- MINI-SLOTS (BOTTOM-RIGHT DROP-UP) -----
-
 const MINI_SYMBOLS = ['相', '力', '土', '勝', '星'];
 
 let miniBet = 5;
@@ -215,7 +217,8 @@ function setupMiniSlots() {
   }
 
   if (betToggle && betMenu && betValue) {
-    betToggle.addEventListener('click', () => {
+    betToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       betMenu.classList.toggle('open');
     });
 
@@ -242,8 +245,71 @@ function setupMiniSlots() {
   updateMiniMeters();
 }
 
-// ----- PROFILE STORAGE -----
+// ----- CHATBOT (BOTTOM-LEFT DROP-UP) -----
+function setupChatbot() {
+  const trigger = $('#chatbotTrigger');
+  const panel = $('#chatPanel');
+  const close = $('#chatClose');
+  const form = $('#chatForm');
+  const input = $('#chatInput');
+  const messages = $('#chatMessages');
+  const modeButtons = $all('.chat-mode-btn');
 
+  if (!trigger || !panel || !form || !input || !messages) return;
+
+  trigger.addEventListener('click', () => {
+    panel.classList.toggle('open');
+  });
+
+  if (close) {
+    close.addEventListener('click', () => panel.classList.remove('open'));
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    addChatMessage('user', text);
+    input.value = '';
+    // Simple fake bot response for demo
+    const lang = $('#chatLanguage')?.value || 'en';
+    const modeBtn = modeButtons.find((b) => b.classList.contains('active'));
+    const mode = modeBtn ? modeBtn.dataset.mode : 'text';
+    let reply = '';
+    if (lang === 'en') {
+      reply = `Demo reply (${mode}): I received "${text}". In a real build, this would call a multilingual multimodal model.`;
+    } else if (lang === 'fr') {
+      reply = `Réponse de démonstration (${mode}) : j'ai reçu « ${text} ». Ici on appellerait un modèle multilingue.`;
+    } else if (lang === 'es') {
+      reply = `Respuesta de demostración (${mode}): recibí «${text}». Aquí se llamaría a un modelo multilingüe.`;
+    } else if (lang === 'jp') {
+      reply = `デモ応答 (${mode})： 「${text}」 を受信しました。実際には多言語マルチモーダルモデルを呼び出します。`;
+    }
+    setTimeout(() => addChatMessage('bot', reply), 200);
+  });
+
+  modeButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      modeButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
+function addChatMessage(role, text) {
+  const messages = $('#chatMessages');
+  if (!messages) return;
+  const wrap = document.createElement('div');
+  wrap.className = `chat-message ${role}`;
+  const bubble = document.createElement('span');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  messages.appendChild(wrap);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// ----- PROFILE STORAGE -----
 function loadProfileFromStorage() {
   const usernameInput = $('#usernameInput');
   const displayNameInput = $('#displayNameInput');
@@ -371,7 +437,6 @@ function updatePlayerName() {
 }
 
 // ----- SETTINGS MODAL -----
-
 function setupSettingsModal() {
   const openBtn = $('#openSettings');
   const closeBtn = $('#closeSettings');
@@ -416,7 +481,6 @@ function setupSettingsModal() {
 }
 
 // ----- LEADERBOARD -----
-
 function bumpLocalWins() {
   const wins = Number(localStorage.getItem('sumoWins') || '0') + 1;
   localStorage.setItem('sumoWins', String(wins));
@@ -448,7 +512,6 @@ function renderLeaderboard() {
 }
 
 // ----- VISITORS (LOCAL APPROXIMATION) -----
-
 function setupVisitors() {
   const onlineEl = $('#onlineVisitors');
   const allTimeEl = $('#allTimeVisitors');
@@ -469,12 +532,13 @@ function setupVisitors() {
 }
 
 // ----- INIT -----
-
 document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
+  setupHamburger();
   setupVisitors();
   setupSumoGame();
   setupMiniSlots();
+  setupChatbot();
   renderLeaderboard();
 
   // Profile-specific behaviour

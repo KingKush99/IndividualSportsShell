@@ -7,8 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="main-header">
-    <div class="logo-area">
+  <!-- TOP BAR -->
+  <header class="shell-header">
+    <!-- Top-left profile button (still profile, but keeps layout consistent) -->
+    <button class="circle-btn profile-btn" onclick="window.location.href='profile.html'" aria-label="Profile">
+      👤
+    </button>
+
+    <!-- Center logo -->
+    <div class="header-center">
       <div class="logo-sumo">
         <span class="logo-sumo-icon">相</span>
       </div>
@@ -17,12 +24,20 @@
         <p>Profile &amp; Fighters</p>
       </div>
     </div>
-    <nav class="main-nav">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="profile.html" class="nav-link active">Profile</a>
-      <a href="index.html#rules" class="nav-link">Rules</a>
-      <a href="index.html#leaderboardSection" class="nav-link">Leaderboard</a>
-    </nav>
+
+    <!-- Top-right hamburger menu -->
+    <div class="hamburger-wrapper">
+      <button id="hamburgerBtn" class="circle-btn hamburger-btn" aria-label="Menu">
+        ☰
+      </button>
+      <div id="hamburgerMenu" class="hamburger-menu">
+        <button class="hamburger-item" onclick="window.location.href='index.html'">Home</button>
+        <button class="hamburger-item">Buy with fiat</button>
+        <button class="hamburger-item">Buy with crypto</button>
+        <button class="hamburger-item">Watch ads</button>
+        <button class="hamburger-item">Turn coins</button>
+      </div>
+    </div>
   </header>
 
   <main class="page-content">
@@ -131,107 +146,73 @@
     </section>
   </main>
 
-  <!-- SETTINGS MODAL -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Profile Settings</h2>
-        <button id="closeSettings" class="modal-close">×</button>
+  <!-- MINI-SLOTS & CHATBOT ALSO AVAILABLE ON PROFILE FOR CONSISTENCY -->
+
+  <button id="miniTrigger" class="circle-btn mini-trigger" aria-label="Open mini-slots">
+    🎰
+  </button>
+  <div id="miniPanel" class="mini-panel">
+    <div class="mini-header">
+      <span>Sumo Reel Mini-Slots</span>
+      <button id="miniClose" class="mini-close">×</button>
+    </div>
+    <div class="mini-body">
+      <div class="mini-reels" id="miniReelsGrid"></div>
+      <div class="mini-controls">
+        <button id="miniBetToggle" class="mini-bet-btn">
+          Bet: <span id="miniBetValue">5</span>
+        </button>
+        <ul id="miniBetMenu" class="mini-bet-menu">
+          <li data-bet="5">5</li>
+          <li data-bet="10">10</li>
+          <li data-bet="20">20</li>
+          <li data-bet="50">50</li>
+        </ul>
+        <button id="miniPushSpin" class="mini-spin-btn">Push</button>
       </div>
-      <div class="modal-body">
-        <div class="settings-grid">
-          <div class="setting-item">
-            <h3>Themes</h3>
-            <label>
-              Site theme
-              <select id="themeSelect">
-                <option value="dark">Dohyo Night (Dark)</option>
-                <option value="light">Morning Basho (Light)</option>
-              </select>
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Notifications</h3>
-            <label>
-              <input type="checkbox" id="notifyStreaks" />
-              Notify me when I beat my best streak
-            </label>
-            <label>
-              <input type="checkbox" id="notifyEvents" />
-              Send special tournament alerts
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Visual</h3>
-            <label>
-              <input type="checkbox" id="reducedMotion" />
-              Reduce animations
-            </label>
-            <label>
-              <input type="checkbox" id="highContrast" />
-              High-contrast mode
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Audio</h3>
-            <label>
-              Master volume
-              <input type="range" id="masterVolume" min="0" max="100" />
-            </label>
-            <label>
-              SFX volume
-              <input type="range" id="sfxVolume" min="0" max="100" />
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Language</h3>
-            <select id="languageSelect">
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <h3>Privacy</h3>
-            <label>
-              <input type="checkbox" id="privacyProfilePublic" />
-              Make my profile public on leaderboards
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Data</h3>
-            <label>
-              <input type="checkbox" id="dataAnalytics" />
-              Allow anonymous analytics
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Tooltips</h3>
-            <label>
-              <input type="checkbox" id="showTooltips" checked />
-              Show helper tooltips
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Controls</h3>
-            <label>
-              <input type="checkbox" id="spaceToCharge" checked />
-              Press Space to charge in game
-            </label>
-          </div>
-          <div class="setting-item">
-            <h3>Reset</h3>
-            <button id="resetProfile" class="danger-btn">
-              Reset profile locally
-            </button>
-          </div>
+      <div class="mini-meters">
+        <div class="mini-meter">
+          <span>Streak</span>
+          <span id="miniStreakValue">0</span>
+        </div>
+        <div class="mini-meter">
+          <span>Tokens</span>
+          <span id="miniTokenValue">250</span>
         </div>
       </div>
-      <div class="modal-footer">
-        <button id="saveSettings" class="primary-btn">Save</button>
+    </div>
+  </div>
+
+  <button id="chatbotTrigger" class="circle-btn chat-trigger" aria-label="Open chatbot">
+    💬
+  </button>
+  <div id="chatPanel" class="chat-panel">
+    <div class="chat-header">
+      <span>Sumo Assistant</span>
+      <select id="chatLanguage" class="chat-language">
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="es">ES</option>
+        <option value="jp">JP</option>
+      </select>
+      <button id="chatClose" class="chat-close">×</button>
+    </div>
+    <div class="chat-modes">
+      <button class="chat-mode-btn active" data-mode="text">Text</button>
+      <button class="chat-mode-btn" data-mode="voice">Voice</button>
+      <button class="chat-mode-btn" data-mode="image">Image</button>
+    </div>
+    <div id="chatMessages" class="chat-messages">
+      <div class="chat-message bot">
+        <span class="chat-bubble">
+          Ask me about controls, rules, or strategy. I will respond based on the selected language mode, but this is a demo-only front-end.
+        </span>
       </div>
     </div>
+    <form id="chatForm" class="chat-input-row">
+      <input id="chatInput" type="text" placeholder="Type your question..." autocomplete="off" />
+      <button type="submit" class="chat-send-btn">Send</button>
+    </form>
   </div>
 
   <footer class="site-footer">
