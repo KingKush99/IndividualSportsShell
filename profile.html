@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Profile · NHL Sports Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="profile-page theme-1">
+  <button class="fab fab-profile" onclick="window.location.href='index.html'" aria-label="Back to main">
+    <span class="fab-icon">🏠</span>
+  </button>
+  <button class="fab fab-menu" onclick="toggleMenu()" aria-label="Main menu">
+    <span class="fab-icon">☰</span>
+  </button>
+  <button class="fab fab-slots" onclick="toggleSlots()" aria-label="Mini slots">
+    <span class="fab-icon">🎰</span>
+  </button>
+  <button class="fab fab-chat" onclick="toggleChat()" aria-label="Assistant chat">
+    <span class="fab-icon">💬</span>
+  </button>
+
+  <!-- reuse modals -->
+  <div id="menuDropdown" class="dropdown hidden"></div>
+  <div id="slotsModal" class="modal modal-dropup sized hidden"></div>
+  <div id="chatModal" class="modal modal-dropup-left sized hidden"></div>
+
+  <header class="profile-header">
+    <div class="profile-tabs">
+      <a href="index.html">Back to Hub</a>
+      <a href="#" class="active">Profile</a>
+      <a href="#">Checkout</a>
+      <a href="#">Stats</a>
+      <a href="#">Items</a>
+    </div>
+  </header>
+
+  <main class="profile-main">
+    <section class="profile-hero">
+      <div class="avatar">
+        <div class="buddy"></div>
+      </div>
+      <div class="identity">
+        <h1 id="profileName">Your Player</h1>
+        <p>Edit your display name, avatar theme, and animation style.</p>
+        <label>Display name:
+          <input id="profileNameInput" value="Your Player" />
+        </label>
+        <label>Character style:
+          <select id="profileStyle">
+            <option value="enforcer">Blue Line Enforcer</option>
+            <option value="sniper">Top‑Shelf Sniper</option>
+            <option value="playmaker">Elite Playmaker</option>
+          </select>
+        </label>
+      </div>
+      <div class="level">
+        <div class="big" id="profileLevel">12</div>
+        <div>Level</div>
+        <label class="toggle">
+          <input type="checkbox" id="autoSpin" checked />
+          <span>Auto Turn</span>
+        </label>
+      </div>
+    </section>
+
+    <div class="xp-strip">
+      <span>XP Progress</span>
+      <div class="xp"><span style="width:65%"></span></div>
+      <span>65%</span>
+    </div>
+
+    <section class="totals">
+      <h2>Overview</h2>
+      <ul class="stats">
+        <li>Mini‑games played <b>128</b></li>
+        <li>Best Sumo Showdown streak <b id="bestStreak">7</b></li>
+        <li>Total tokens earned <b>34,250</b></li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="main.js" defer></script>
+</body>
+</html>
