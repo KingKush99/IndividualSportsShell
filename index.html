@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset='UTF-8'>
-<title>Sumo Clone</title>
-<link rel='stylesheet' href='style.css'>
+  <meta charset="UTF-8" />
+  <title>Sumo Showdown Clone</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<canvas id='game' width='800' height='600'></canvas>
-<script src='script.js'></script>
+  <div id="hud">
+    <div class="hp-wrapper">
+      <div class="hp-label">You</div>
+      <div class="hp-bar"><div id="hpPlayer" class="hp-fill"></div></div>
+    </div>
+    <div class="hp-center">
+      <div class="nebari-main">ねばり</div>
+      <div class="nebari-sub">Stamina</div>
+    </div>
+    <div class="hp-wrapper">
+      <div class="hp-label right">CPU</div>
+      <div class="hp-bar"><div id="hpCpu" class="hp-fill"></div></div>
+    </div>
+  </div>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <div id="msgBar"></div>
+  <script src="script.js"></script>
 </body>
 </html>
