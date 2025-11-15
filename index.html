@@ -1,252 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sumo Showdown – Individual Sports Shell</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Sumo Showdown Hub - Home</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Corner circular buttons -->
-  <button id="profileButton" class="corner-btn corner-top-left" title="Profile">
-    👤
-  </button>
-
-  <button id="menuButton" class="corner-btn corner-top-right" title="Menu">
-    ☰
-  </button>
-  <div id="menuDropdown" class="corner-dropdown hidden">
-    <button class="dropdown-item">Buy with Fiat</button>
-    <button class="dropdown-item">Buy with Crypto</button>
-    <button class="dropdown-item">Watch Ads</button>
-    <button class="dropdown-item">Turn Coins</button>
-  </div>
-
-  <button id="chatbotButton" class="corner-btn corner-bottom-left" title="Chatbot">
-    💬
-  </button>
-  <div id="chatbotPanel" class="corner-panel corner-bottom-left-panel hidden">
-    <div class="panel-header">Sumo Assistant (Multilingual)</div>
-    <div class="panel-body">
-      <div class="chat-log" id="chatLog">
-        <div class="chat-message bot">こんにちは！ Ask me anything about the sumo game.</div>
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="chatInput" placeholder="Type your message..." />
-        <button id="chatSend">Send</button>
+  <header class="main-header">
+    <button class="circle-btn profile-btn" onclick="window.location.href='profile.html'">
+      <span class="icon">👤</span>
+    </button>
+    <h1 class="site-title" data-i18n="siteTitle">Sumo Showdown Hub</h1>
+    <div class="hamburger-wrapper">
+      <button class="circle-btn hamburger-btn" onclick="toggleHamburgerMenu()">
+        ☰
+      </button>
+      <div id="hamburgerMenu" class="hamburger-menu">
+        <button data-i18n="buyFiat">Buy with fiat</button>
+        <button data-i18n="buyCrypto">Buy with crypto</button>
+        <button data-i18n="watchAds">Watch ads</button>
+        <button data-i18n="turnCoins">Turn coins</button>
       </div>
     </div>
-  </div>
-
-  <button id="miniSlotsButton" class="corner-btn corner-bottom-right" title="Mini-Slots">
-    🎰
-  </button>
-  <div id="miniSlotsPanel" class="corner-panel corner-bottom-right-panel hidden">
-    <div class="panel-header">Mini-Slots</div>
-    <div class="panel-body">
-      <div class="slots-row">
-        <div class="slot-cell" id="slot1">🍙</div>
-        <div class="slot-cell" id="slot2">🥋</div>
-        <div class="slot-cell" id="slot3">🍶</div>
-      </div>
-      <button id="slotsSpinButton" class="spin-button">Push to Spin</button>
-      <div id="slotsMessage" class="slots-message">Try your luck!</div>
-    </div>
-  </div>
-
-  <!-- Page layout -->
-  <header class="site-header">
-    <div class="site-title">Sumo Showdown</div>
-    <nav class="main-nav">
-      <button class="nav-tab active" data-tab="homeTab">Home</button>
-      <button class="nav-tab" data-tab="leaderboardTab">Leaderboard</button>
-      <button class="nav-tab" data-tab="statsTab">Stats</button>
-      <button class="nav-tab" data-tab="scoresTab">Scores</button>
-      <button class="nav-tab" data-tab="standingsTab">Standings</button>
-      <button class="nav-tab" data-tab="playersTab">Players</button>
-      <button class="nav-tab" data-tab="scheduleTab">Schedule</button>
-      <button class="nav-tab" data-tab="locationTab">Location</button>
-    </nav>
   </header>
 
-  <main class="site-main">
-    <!-- HOME TAB -->
-    <section id="homeTab" class="tab-page active">
-      <div class="subtabs">
-        <button class="subtab-btn active" data-subtab="gameSubtab">Game</button>
-        <button class="subtab-btn" data-subtab="gameLbSubtab">Game Leaderboard</button>
-      </div>
+  <main class="home-main">
+    <div class="tabs">
+      <button id="tabGame" class="tab active" onclick="showHomeTab('game')" data-i18n="tabGame">Game</button>
+      <button id="tabLeaderboard" class="tab" onclick="showHomeTab('leaderboard')" data-i18n="tabGameLeaderboard">Game Leaderboard</button>
+    </div>
 
-      <div id="gameSubtab" class="subtab-content active">
-        <div id="hud">
-          <div class="hp-wrapper">
-            <div class="hp-label" id="playerNameLabel">You</div>
-            <div class="hp-bar">
-              <div id="hpPlayer" class="hp-fill"></div>
-            </div>
-          </div>
-          <div class="hp-center">
-            <div class="nebari-main">ねばり</div>
-            <div class="nebari-sub">Stamina</div>
-          </div>
-          <div class="hp-wrapper">
-            <div class="hp-label right">CPU</div>
-            <div class="hp-bar">
-              <div id="hpCpu" class="hp-fill"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="canvas-wrapper">
-          <canvas id="sumoCanvas" width="800" height="600"></canvas>
-        </div>
-        <div id="msgBar"></div>
-        <div class="controls-hint">
-          Controls: ← / → / ↑ / ↓ or W/A/S/D to walk, Space to charge. Push your opponent out of the ring!
-        </div>
-      </div>
-
-      <div id="gameLbSubtab" class="subtab-content">
-        <h2>Game Leaderboard</h2>
-        <p>These stats are stored locally in your browser (per device).</p>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Display Name</th>
-              <th>Wins</th>
-              <th>Bouts Played</th>
-            </tr>
-          </thead>
-          <tbody id="gameLeaderboardBody">
-            <!-- Filled by JS -->
-          </tbody>
-        </table>
-      </div>
+    <section id="gameSection" class="home-section active">
+      <canvas id="sumoCanvas" width="700" height="450"></canvas>
     </section>
 
-    <!-- GLOBAL LEADERBOARD TAB -->
-    <section id="leaderboardTab" class="tab-page">
-      <h2>Global Leaderboard</h2>
-      <p>Hook this into your backend or shared storage later.</p>
-      <table class="table">
+    <section id="leaderboardSection" class="home-section">
+      <h2 data-i18n="gameLeaderboardHeading">Top Wrestlers</h2>
+      <table id="gameLeaderboardTable" class="leaderboard-table">
         <thead>
           <tr>
-            <th>Rank</th>
-            <th>Username</th>
-            <th>Region</th>
-            <th>Wins</th>
+            <th>#</th>
+            <th data-i18n="username">Username</th>
+            <th data-i18n="wins">Wins</th>
           </tr>
         </thead>
-        <tbody>
-          <tr><td>1</td><td>SumoKing</td><td>Tokyo</td><td>128</td></tr>
-          <tr><td>2</td><td>DojoMaster</td><td>Osaka</td><td>97</td></tr>
-          <tr><td>3</td><td>BeltCrusher</td><td>Toronto</td><td>73</td></tr>
-        </tbody>
+        <tbody></tbody>
       </table>
-    </section>
-
-    <!-- STATS TAB -->
-    <section id="statsTab" class="tab-page">
-      <h2>Your Stats</h2>
-      <ul class="bullet-list" id="statsList">
-        <!-- Populated by JS from localStorage -->
-      </ul>
-    </section>
-
-    <!-- SCORES TAB -->
-    <section id="scoresTab" class="tab-page">
-      <h2>Recent Scores</h2>
-      <p>Display recent bouts, scores, and match summaries here.</p>
-      <div id="scoresList" class="card-list">
-        <!-- Populated or extend later -->
-      </div>
-    </section>
-
-    <!-- STANDINGS TAB -->
-    <section id="standingsTab" class="tab-page">
-      <h2>Standings</h2>
-      <p>Use this section for leagues, ladders, or divisions.</p>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Division</th>
-            <th>Player</th>
-            <th>Record</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Makuuchi</td><td>SumoKing</td><td>12–1</td></tr>
-          <tr><td>Juryo</td><td>DojoMaster</td><td>9–4</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- PLAYERS TAB -->
-    <section id="playersTab" class="tab-page">
-      <h2>Players</h2>
-      <p>Overview of key wrestlers and sample profiles.</p>
-      <div class="card-list">
-        <div class="card">
-          <h3>Hoshi “Red Mawashi”</h3>
-          <p>Offensive powerhouse who loves early charges and edge play.</p>
-        </div>
-        <div class="card">
-          <h3>Aoi “Blue Wall”</h3>
-          <p>Defensive master who absorbs hits and counter-pushes.</p>
-        </div>
-        <div class="card">
-          <h3>You</h3>
-          <p>Your display name and cosmetics are controlled from the profile page.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SCHEDULE TAB -->
-    <section id="scheduleTab" class="tab-page">
-      <h2>Schedule</h2>
-      <p>Example local tournament schedule.</p>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Event</th>
-            <th>Location</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>2026-01-10</td><td>Winter Basho</td><td>Tokyo Dojo A</td></tr>
-          <tr><td>2026-02-05</td><td>Street Sumo Showdown</td><td>Downtown Arena</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- LOCATION TAB -->
-    <section id="locationTab" class="tab-page">
-      <h2>Location</h2>
-      <p>Show where your events or club are based.</p>
-      <div class="location-card">
-        <h3>Primary Arena</h3>
-        <p>123 Dojo Lane, Tokyo / or your real-world venue.</p>
-        <p>Embed a map or directions widget here.</p>
-      </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-grid">
-      <a href="#" class="footer-link">Privacy Policy</a>
-      <a href="#" class="footer-link">Cookies Policy</a>
-      <a href="#" class="footer-link">Community Guidelines</a>
-      <a href="#" class="footer-link">Contact Us</a>
-      <a href="#" class="footer-link">Help Center</a>
-      <a href="#" class="footer-link">FAQs</a>
+  <!-- Chatbot circular button bottom-left -->
+  <button id="chatbotTrigger" class="circle-btn bottom-left" onclick="openChatbotModal()">💬</button>
+
+  <!-- Mini-slots circular button bottom-right -->
+  <button id="miniSlotsTrigger" class="circle-btn bottom-right" onclick="showMiniSlots()">🎰</button>
+
+  <!-- Chatbot Modal -->
+  <div id="chatbotModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="chatbotTitle">Sumo Assistant</span>
+        <button class="modal-close" onclick="closeChatbotModal()">✕</button>
+      </div>
+      <div class="mini-row">
+        <label for="chatLang" data-i18n="assistantLanguage">Assistant language</label>
+        <select id="chatLang">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+        </select>
+      </div>
+      <div id="chatLog" class="chat-log"></div>
+      <div class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Ask about sumo..." data-i18n-placeholder="chatPlaceholder">
+        <button onclick="sendFakeChat()" data-i18n="send">Send</button>
+      </div>
     </div>
-    <div class="footer-stats">
-      <span id="onlineNow">Online now: 1</span>
-      <span id="allTimeVisitors">All-time visitors: 1</span>
+  </div>
+
+  <!-- Mini-Slots Modal -->
+  <div id="miniSlotsModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="miniSlotsTitle">Sumo Reel Mini-Slots</span>
+        <button class="modal-close" onclick="hideMiniSlots()">✕</button>
+      </div>
+
+      <div class="mini-row">
+        <label for="reelCountSelect" data-i18n="reels">Reels:</label>
+        <select id="reelCountSelect">
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+
+      <div id="reelsContainer" class="reels-container"></div>
+
+      <div class="mini-bottom">
+        <div class="bets">
+          <button onclick="setBet(10)">10</button>
+          <button onclick="setBet(25)">25</button>
+          <button onclick="setBet(50)">50</button>
+          <button onclick="setBet(100)">100</button>
+          <button onclick="setBet(500)">500</button>
+        </div>
+
+        <button id="pushSpinBtn" class="push-btn">PUSH</button>
+
+        <div id="slotLever" class="lever" onclick="pullLever()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer + language drop-up -->
+  <footer id="globalFooter">
+    <div class="footer-top">
+      <div class="visitor-counters">
+        <div class="counter-label" data-i18n="onlineNow">ONLINE NOW</div>
+        <div class="digit-row" id="onlineDigits"></div>
+        <div class="counter-label" data-i18n="allTimeVisitors">ALL TIME VISITORS</div>
+        <div class="digit-row" id="allTimeDigits"></div>
+      </div>
+    </div>
+
+    <div class="footer-grid-2x3">
+      <button class="footer-col" onclick="openFooterModal('accessibilityModal')">
+        <span class="footer-heading" data-i18n="footerAccessibility">ACCESSIBILITY</span>
+      </button>
+      <button class="footer-col" onclick="openFooterModal('companyModal')">
+        <span class="footer-heading" data-i18n="footerCompany">COMPANY</span>
+      </button>
+      <button class="footer-col" onclick="openFooterModal('competitionsModal')">
+        <span class="footer-heading" data-i18n="footerCompetitions">COMPETITIONS</span>
+      </button>
+      <button class="footer-col" onclick="openFooterModal('legalModal')">
+        <span class="footer-heading" data-i18n="footerLegal">LEGAL</span>
+      </button>
+      <button class="footer-col" onclick="openFooterModal('supportModal')">
+        <span class="footer-heading" data-i18n="footerSupport">SUPPORT</span>
+      </button>
+      <button class="footer-col" onclick="openFooterModal('socialModal')">
+        <span class="footer-heading" data-i18n="footerSocial">SOCIAL MEDIA</span>
+      </button>
+    </div>
+
+    <div class="language-dropup">
+      <button class="language-toggle">🌐</button>
+      <div class="language-panel">
+        <select id="globalLanguageSelect">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+        </select>
+      </div>
     </div>
   </footer>
+
+  <!-- Footer modals -->
+  <div id="accessibilityModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerAccessibility">ACCESSIBILITY</span>
+        <button class="modal-close" onclick="closeFooterModal('accessibilityModal')">✕</button>
+      </div>
+      <p data-i18n="accessibilityBody">Accessibility options and suggestions.</p>
+    </div>
+  </div>
+
+  <div id="companyModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerCompany">COMPANY</span>
+        <button class="modal-close" onclick="closeFooterModal('companyModal')">✕</button>
+      </div>
+      <p data-i18n="companyBody">About the Sumo Showdown company.</p>
+    </div>
+  </div>
+
+  <div id="competitionsModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerCompetitions">COMPETITIONS</span>
+        <button class="modal-close" onclick="closeFooterModal('competitionsModal')">✕</button>
+      </div>
+      <p data-i18n="competitionsBody">Tournaments, prizes and awards.</p>
+    </div>
+  </div>
+
+  <div id="legalModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerLegal">LEGAL</span>
+        <button class="modal-close" onclick="closeFooterModal('legalModal')">✕</button>
+      </div>
+      <p data-i18n="legalBody">Terms, privacy, cookies and community rules.</p>
+    </div>
+  </div>
+
+  <div id="supportModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerSupport">SUPPORT</span>
+        <button class="modal-close" onclick="closeFooterModal('supportModal')">✕</button>
+      </div>
+      <p data-i18n="supportBody">Contact, help center, FAQs and bug reports.</p>
+    </div>
+  </div>
+
+  <div id="socialModal" class="modal-backdrop">
+    <div class="mini-modal">
+      <div class="mini-header">
+        <span data-i18n="footerSocial">SOCIAL MEDIA</span>
+        <button class="modal-close" onclick="closeFooterModal('socialModal')">✕</button>
+      </div>
+      <p data-i18n="socialBody">Links to social channels.</p>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

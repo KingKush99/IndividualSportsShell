@@ -1,914 +1,723 @@
-// ========== INITIAL SETUP ==========
-window.addEventListener("DOMContentLoaded", () => {
-  setupNavTabs();
-  setupSubtabs();
-  setupCornerUI();
-  setupChatbot();
-  setupMiniSlots();
-  setupStats();
+// --- language dictionary ---
+const GLOBAL_TRANSLATIONS = {
+  en: {
+    siteTitle: "Sumo Showdown Hub",
+    profileTitle: "Profile & Fighters",
+    tabGame: "Game",
+    tabGameLeaderboard: "Game Leaderboard",
+    gameLeaderboardHeading: "Top Wrestlers",
+    username: "Username",
+    wins: "Wins",
+    onlineNow: "ONLINE NOW",
+    allTimeVisitors: "ALL TIME VISITORS",
+    footerAccessibility: "ACCESSIBILITY",
+    footerCompany: "COMPANY",
+    footerCompetitions: "COMPETITIONS",
+    footerLegal: "LEGAL",
+    footerSupport: "SUPPORT",
+    footerSocial: "SOCIAL MEDIA",
+    chatbotTitle: "Sumo Assistant",
+    assistantLanguage: "Assistant language",
+    chatPlaceholder: "Ask about sumo...",
+    send: "Send",
+    miniSlotsTitle: "Sumo Reel Mini-Slots",
+    reels: "Reels:",
+    customizeHeader: "Character Customization",
+    nameLabel: "Username (changes 1× per week)",
+    displayNameLabel: "Display Name",
+    displayNameNote: "Display name appears in game and profile, username appears on leaderboards.",
+    appearanceHeader: "Appearance",
+    bodyType: "Body Type",
+    hairStyle: "Hair Style",
+    shirtStyle: "Shirt Style",
+    pantsStyle: "Pants Style",
+    eyeShape: "Eye Shape",
+    mouthShape: "Mouth Shape",
+    colorsHeader: "Colors",
+    skinColor: "Skin",
+    hairColor: "Hair",
+    mawashiColor: "Mawashi",
+    skillPointsHeader: "Skill Points",
+    availablePoints: "Available:",
+    subTabStats: "Stats",
+    subTabItems: "Items",
+    subTabCampaign: "Campaign",
+    subTabCheckout: "Checkout",
+    progressHeader: "Progress",
+    currentLevel: "Level",
+    itemsBody: "Your mawashi, banners and entrance effects will appear here.",
+    campaignBody: "Progress through arenas and stadiums is tracked here.",
+    checkoutBody: "Tokens and cosmetic purchases summary.",
+    settingsTitle: "Settings",
+    settingTheme: "Theme",
+    settingNotifications: "Notifications",
+    settingVisual: "Visual settings",
+    settingAudio: "Audio settings",
+    settingControls: "Controls",
+    settingAccessibility: "Accessibility",
+    settingLanguage: "Language",
+    settingPrivacy: "Privacy",
+    settingSecurity: "Security",
+    settingAccount: "Account",
+    accessibilityBody: "Accessibility options and suggestions.",
+    companyBody: "About the Sumo Showdown company.",
+    competitionsBody: "Tournaments, prizes and awards.",
+    legalBody: "Terms, privacy, cookies and community rules.",
+    supportBody: "Contact, help center, FAQs and bug reports.",
+    socialBody: "Links to social channels.",
+    buyFiat: "Buy with fiat",
+    buyCrypto: "Buy with crypto",
+    watchAds: "Watch ads",
+    turnCoins: "Turn coins"
+  },
+  fr: {
+    siteTitle: "Centre Sumo Showdown",
+    profileTitle: "Profil et Combattants",
+    tabGame: "Jeu",
+    tabGameLeaderboard: "Classement du jeu",
+    gameLeaderboardHeading: "Meilleurs lutteurs",
+    username: "Identifiant",
+    wins: "Victoires",
+    onlineNow: "EN LIGNE",
+    allTimeVisitors: "VISITES TOTALES",
+    footerAccessibility: "ACCESSIBILITÉ",
+    footerCompany: "ENTREPRISE",
+    footerCompetitions: "COMPÉTITIONS",
+    footerLegal: "JURIDIQUE",
+    footerSupport: "SUPPORT",
+    footerSocial: "RÉSEAUX SOCIAUX"
+  }
+};
 
-  const displayName = getDisplayName();
-  const playerLabel = document.getElementById("playerNameLabel");
-  if (playerLabel) playerLabel.textContent = displayName || "You";
+const LANGUAGE_STORAGE_KEY = "sumoGlobalLang";
 
-  initSumoGame();
-});
-
-// ========== SIMPLE PROFILE NAME HOOKS ==========
-function getDisplayName() {
-  return localStorage.getItem("displayName") || "You";
+function applyGlobalLanguage(langCode) {
+  const dict = GLOBAL_TRANSLATIONS[langCode] || GLOBAL_TRANSLATIONS.en;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (dict[key]) el.setAttribute("placeholder", dict[key]);
+  });
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, langCode);
 }
 
-function getUsername() {
-  return localStorage.getItem("username") || "Player1";
+function initLanguage() {
+  const select = document.getElementById("globalLanguageSelect");
+  const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "en";
+  if (select) {
+    select.value = saved;
+    select.addEventListener("change", () => applyGlobalLanguage(select.value));
+  }
+  applyGlobalLanguage(saved);
 }
 
-// ========== TABS ==========
-function setupNavTabs() {
-  const tabs = document.querySelectorAll(".nav-tab");
-  tabs.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("data-tab");
-      document
-        .querySelectorAll(".tab-page")
-        .forEach((p) => p.classList.remove("active"));
-      document
-        .querySelectorAll(".nav-tab")
-        .forEach((t) => t.classList.remove("active"));
-      document.getElementById(targetId).classList.add("active");
-      btn.classList.add("active");
-    });
+// hamburger
+function toggleHamburgerMenu() {
+  const menu = document.getElementById("hamburgerMenu");
+  if (menu) menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// footer counters
+function initVisitorCounters() {
+  const online = 66;
+  const allTime = 1509381;
+  fillDigitRow("onlineDigits", online);
+  fillDigitRow("allTimeDigits", allTime);
+}
+
+function fillDigitRow(id, number) {
+  const container = document.getElementById(id);
+  if (!container) return;
+  container.innerHTML = "";
+  const str = number.toString().padStart(6,"0");
+  for (const ch of str) {
+    const box = document.createElement("div");
+    box.className = "digit-box";
+    box.textContent = ch;
+    container.appendChild(box);
+  }
+}
+
+function openFooterModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add("active");
+}
+function closeFooterModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove("active");
+}
+
+// chatbot
+function openChatbotModal() {
+  const modal = document.getElementById("chatbotModal");
+  if (modal) modal.classList.add("active");
+}
+function closeChatbotModal() {
+  const modal = document.getElementById("chatbotModal");
+  if (modal) modal.classList.remove("active");
+}
+function sendFakeChat() {
+  const input = document.getElementById("chatInput");
+  const log = document.getElementById("chatLog");
+  if (!input || !log || !input.value.trim()) return;
+  const pUser = document.createElement("p");
+  pUser.textContent = "You: " + input.value;
+  const pBot = document.createElement("p");
+  pBot.textContent = "Assistant: Imagine a detailed answer about sumo here.";
+  log.appendChild(pUser);
+  log.appendChild(pBot);
+  log.scrollTop = log.scrollHeight;
+  input.value = "";
+}
+
+// mini-slots
+let currentBet = 10;
+let currentReelCount = 3;
+
+function showMiniSlots() {
+  const modal = document.getElementById("miniSlotsModal");
+  if (modal) modal.classList.add("active");
+  buildReels();
+}
+function hideMiniSlots() {
+  const modal = document.getElementById("miniSlotsModal");
+  if (modal) modal.classList.remove("active");
+}
+function setBet(amount) { currentBet = amount; }
+
+function buildReels() {
+  const select = document.getElementById("reelCountSelect");
+  const container = document.getElementById("reelsContainer");
+  if (!select || !container) return;
+  const count = parseInt(select.value, 10);
+  currentReelCount = count;
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement("div");
+    div.className = "reel";
+    div.textContent = "—";
+    container.appendChild(div);
+  }
+}
+
+function spinReels() {
+  const container = document.getElementById("reelsContainer");
+  if (!container) return;
+  const reels = Array.from(container.querySelectorAll(".reel"));
+  const symbols = ["🍱","🥟","🥢","💥","🌀","🎌"];
+  reels.forEach((reel, index) => {
+    setTimeout(() => {
+      let steps = 12;
+      const interval = setInterval(() => {
+        reel.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+        steps--;
+        if (steps <= 0) clearInterval(interval);
+      }, 40);
+    }, index * 110);
   });
 }
 
-function setupSubtabs() {
-  const subBtns = document.querySelectorAll(".subtab-btn");
-  subBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("data-subtab");
-      document
-        .querySelectorAll(".subtab-content")
-        .forEach((s) => s.classList.remove("active"));
-      document
-        .querySelectorAll(".subtab-btn")
-        .forEach((b) => b.classList.remove("active"));
-      document.getElementById(targetId).classList.add("active");
-      btn.classList.add("active");
-    });
+function pullLever() { spinReels(); }
+
+// sumo game
+let canvas, ctx;
+let lastTime = 0;
+
+const ringRadius = 180;
+const sandRadius = 220;
+const grabDistance = 50;
+const throwImpulse = 8;
+
+const players = [
+  {
+    id: 1,
+    username: localStorage.getItem("sumoProfileUsername") || "Player1",
+    x: -60, y: 0, vx: 0, vy: 0, facing: 1,
+    grabbed: null, isGrabbing: false
+  },
+  {
+    id: 2,
+    username: "CPU",
+    x: 60, y: 0, vx: 0, vy: 0, facing: -1,
+    grabbed: null, isGrabbing: false
+  }
+];
+
+const referee = { x: 0, y: -40, phase: 0 };
+const crowdSeats = [];
+for (let i = 0; i < 40; i++) {
+  const angle = (i / 40) * Math.PI * 2;
+  crowdSeats.push({
+    x: Math.cos(angle) * 260,
+    y: Math.sin(angle) * 260,
+    color: i % 3 === 0 ? "#ffd39b" : "#f2c27a"
   });
 }
 
-// ========== CORNER UI ==========
-function setupCornerUI() {
-  const profileButton = document.getElementById("profileButton");
-  if (profileButton) {
-    profileButton.addEventListener("click", () => {
-      window.location.href = "profile.html";
-    });
+const keys = {};
+window.addEventListener("keydown", e => { keys[e.key] = true; });
+window.addEventListener("keyup", e => { keys[e.key] = false; });
+
+function initHomeIfPresent() {
+  canvas = document.getElementById("sumoCanvas");
+  if (!canvas) return;
+  ctx = canvas.getContext("2d");
+  requestAnimationFrame(gameLoop);
+  buildGameLeaderboard();
+}
+
+function gameLoop(timestamp) {
+  if (!canvas) return;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+  updateSumo(dt);
+  drawGame();
+  requestAnimationFrame(gameLoop);
+}
+
+function updateSumo(dt) {
+  const p1 = players[0];
+  const p2 = players[1];
+  const speed = 150;
+
+  p1.vx = 0; p1.vy = 0;
+  if (keys["a"]) p1.vx -= speed;
+  if (keys["d"]) p1.vx += speed;
+  if (keys["w"]) p1.vy -= speed;
+  if (keys["s"]) p1.vy += speed;
+  if (p1.vx !== 0) p1.facing = Math.sign(p1.vx);
+
+  const dx = p1.x - p2.x;
+  const dy = p1.y - p2.y;
+  const dist = Math.hypot(dx, dy);
+  p2.vx = (dx / (dist || 1)) * speed * 0.6;
+  p2.vy = (dy / (dist || 1)) * speed * 0.6;
+  if (p2.vx !== 0) p2.facing = Math.sign(p2.vx);
+
+  const closeEnough = dist < grabDistance;
+  if (keys[" "] && closeEnough && !p1.grabbed && !p2.grabbed) {
+    p1.grabbed = p2;
+    p2.grabbed = p1;
+    p1.isGrabbing = true;
+  }
+  if (!keys[" "] && p1.isGrabbing && p1.grabbed) {
+    const target = p1.grabbed;
+    const throwDirX = p1.facing;
+    const throwDirY = (Math.random() - 0.5) * 0.8;
+    target.vx += throwDirX * throwImpulse * 60;
+    target.vy += throwDirY * throwImpulse * 60;
+    p1.grabbed = null;
+    target.grabbed = null;
+    p1.isGrabbing = false;
   }
 
-  const menuButton = document.getElementById("menuButton");
-  const menuDropdown = document.getElementById("menuDropdown");
-  if (menuButton && menuDropdown) {
-    menuButton.addEventListener("click", () => {
-      menuDropdown.classList.toggle("hidden");
-    });
-    document.addEventListener("click", (e) => {
-      if (!menuButton.contains(e.target) && !menuDropdown.contains(e.target)) {
-        menuDropdown.classList.add("hidden");
+  players.forEach(p => {
+    if (p.grabbed) {
+      const other = p.grabbed;
+      other.x = p.x + p.facing * 25;
+      other.y = p.y;
+    }
+  });
+
+  players.forEach(p => {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    const r = Math.hypot(p.x, p.y);
+    if (r > ringRadius) {
+      const scale = ringRadius / r;
+      p.x *= scale;
+      p.y *= scale;
+    }
+  });
+
+  referee.phase += dt * 0.6;
+  referee.x = Math.cos(referee.phase) * 20;
+  referee.y = -40 + Math.sin(referee.phase) * 8;
+}
+
+function drawCrowd(ctx) {
+  crowdSeats.forEach(seat => {
+    ctx.save();
+    ctx.translate(seat.x, seat.y);
+    ctx.fillStyle = "#4b4b4b";
+    ctx.fillRect(-7, 6, 14, 6);
+    ctx.fillStyle = seat.color;
+    ctx.fillRect(-5, -4, 10, 16);
+    ctx.beginPath();
+    ctx.arc(0, -10, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(-4, 10, 3, 6);
+    ctx.fillRect(1, 10, 3, 6);
+    ctx.restore();
+  });
+}
+
+function drawReferee(ctx) {
+  ctx.save();
+  ctx.translate(referee.x, referee.y);
+  ctx.fillStyle = "#f3d0a0";
+  ctx.fillRect(-6, 14, 8, 22);
+  ctx.fillRect(0, 14, 8, 22);
+  ctx.fillStyle = "#e67e22";
+  ctx.beginPath();
+  ctx.rect(-14, -4, 28, 30);
+  ctx.fill();
+  ctx.fillStyle = "#f3d0a0";
+  ctx.beginPath();
+  ctx.arc(0, -14, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#111";
+  ctx.fillRect(-9, -22, 18, 8);
+  ctx.restore();
+}
+
+function drawFighter(ctx, p, isPlayer1) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+
+  ctx.fillStyle = "#f3d0a0";
+  ctx.beginPath();
+  ctx.rect(-10, 20, 12, 30);
+  ctx.rect(-2, 20, 12, 30);
+  ctx.fill();
+  ctx.fillStyle = "#111";
+  ctx.fillRect(-12, 48, 16, 6);
+  ctx.fillRect(-2, 48, 16, 6);
+
+  ctx.fillStyle = "#f3d0a0";
+  ctx.rect(-18, -10, 36, 34);
+  ctx.fill();
+
+  ctx.fillStyle = "#c98a7a";
+  ctx.beginPath();
+  ctx.arc(-8, 2, 2, 0, Math.PI * 2);
+  ctx.arc(8, 2, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = isPlayer1 ? "#e74c3c" : "#3498db";
+  ctx.fillRect(-18, 16, 36, 12);
+
+  ctx.fillStyle = "#f3d0a0";
+  ctx.beginPath();
+  ctx.rect(-28, -8, 10, 26);
+  ctx.rect(18, -8, 10, 26);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(0, -22, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#2c1b12";
+  ctx.beginPath();
+  ctx.arc(0, -26, 14, Math.PI, 0);
+  ctx.fill();
+
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(-5, -24, 2, 0, Math.PI * 2);
+  ctx.arc(5, -24, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(-6, -18);
+  ctx.quadraticCurveTo(0, -16, 6, -18);
+  ctx.strokeStyle = "#a03030";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawGame() {
+  if (!ctx) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2, canvas.height/2);
+
+  ctx.fillStyle = "#cfa46a";
+  ctx.beginPath();
+  ctx.arc(0, 0, sandRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#f1d9a3";
+  ctx.beginPath();
+  ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#b88646";
+  ctx.lineWidth = 6;
+  ctx.stroke();
+
+  drawCrowd(ctx);
+  drawReferee(ctx);
+  drawFighter(ctx, players[0], true);
+  drawFighter(ctx, players[1], false);
+
+  ctx.restore();
+}
+
+function showHomeTab(name) {
+  const gameSec = document.getElementById("gameSection");
+  const lbSec = document.getElementById("leaderboardSection");
+  const t1 = document.getElementById("tabGame");
+  const t2 = document.getElementById("tabLeaderboard");
+  if (!gameSec || !lbSec || !t1 || !t2) return;
+  if (name === "game") {
+    gameSec.classList.add("active");
+    lbSec.classList.remove("active");
+    t1.classList.add("active");
+    t2.classList.remove("active");
+  } else {
+    lbSec.classList.add("active");
+    gameSec.classList.remove("active");
+    t2.classList.add("active");
+    t1.classList.remove("active");
+  }
+}
+
+// leaderboard uses username
+function buildGameLeaderboard() {
+  const tbody = document.querySelector("#gameLeaderboardTable tbody");
+  if (!tbody) return;
+  const username = localStorage.getItem("sumoProfileUsername") || "Player1";
+  const data = [
+    { username, wins: 32 },
+    { username: "SumoPro99", wins: 28 },
+    { username: "RingTiger", wins: 25 }
+  ];
+  tbody.innerHTML = "";
+  data.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i+1}</td><td>${row.username}</td><td>${row.wins}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// profile
+const XP_THRESHOLDS = [1000,3000,6000,10000,15000];
+
+function initProfileIfPresent() {
+  const canvas = document.getElementById("profileCanvas");
+  if (!canvas) return;
+
+  const usernameInput = document.getElementById("usernameInput");
+  const displayInput = document.getElementById("displayNameInput");
+
+  const storedUser = localStorage.getItem("sumoProfileUsername") || "";
+  const storedDisplay = localStorage.getItem("sumoDisplayName") || "";
+  if (usernameInput) usernameInput.value = storedUser;
+  if (displayInput) displayInput.value = storedDisplay;
+
+  if (usernameInput) {
+    usernameInput.addEventListener("change", () => {
+      const lastChange = parseInt(localStorage.getItem("sumoUsernameLastChange") || "0", 10);
+      const now = Date.now();
+      const weekMs = 7*24*60*60*1000;
+      if (now - lastChange < weekMs) {
+        alert("Username can only be changed once per week.");
+        usernameInput.value = storedUser;
+      } else {
+        const val = usernameInput.value.trim().slice(0,64);
+        localStorage.setItem("sumoProfileUsername", val);
+        localStorage.setItem("sumoUsernameLastChange", String(now));
       }
     });
   }
 
-  const chatbotButton = document.getElementById("chatbotButton");
-  const chatbotPanel = document.getElementById("chatbotPanel");
-  if (chatbotButton && chatbotPanel) {
-    chatbotButton.addEventListener("click", () => {
-      chatbotPanel.classList.toggle("hidden");
+  if (displayInput) {
+    displayInput.addEventListener("input", () => {
+      const val = displayInput.value.trim().slice(0,64);
+      localStorage.setItem("sumoDisplayName", val);
     });
   }
 
-  const miniSlotsButton = document.getElementById("miniSlotsButton");
-  const miniSlotsPanel = document.getElementById("miniSlotsPanel");
-  if (miniSlotsButton && miniSlotsPanel) {
-    miniSlotsButton.addEventListener("click", () => {
-      miniSlotsPanel.classList.toggle("hidden");
+  const stats = ["strength","agility","attack","defence","vitality","charisma","stamina","magicka"];
+  const baseValue = 1;
+  const statControls = document.getElementById("statControls");
+  const remainingSpan = document.getElementById("skillPointsRemaining");
+  const statState = {};
+  stats.forEach(name => statState[name] = baseValue);
+  let remaining = 9;
+  stats.forEach(name => {
+    const row = document.createElement("div");
+    row.className = "stat-row";
+    const label = document.createElement("span");
+    label.textContent = name;
+    const valueSpan = document.createElement("span");
+    valueSpan.textContent = String(statState[name]);
+    const btns = document.createElement("span");
+    const minus = document.createElement("button");
+    minus.textContent = "−";
+    const plus = document.createElement("button");
+    plus.textContent = "+";
+    minus.addEventListener("click", () => {
+      if (statState[name] > baseValue) {
+        statState[name]--;
+        remaining++;
+        valueSpan.textContent = statState[name];
+        remainingSpan.textContent = remaining;
+      }
     });
-  }
-}
-
-// ========== CHATBOT (LOCAL DUMMY) ==========
-function setupChatbot() {
-  const chatInput = document.getElementById("chatInput");
-  const chatSend = document.getElementById("chatSend");
-  const chatLog = document.getElementById("chatLog");
-  if (!chatInput || !chatSend || !chatLog) return;
-
-  function addMessage(text, who) {
-    const div = document.createElement("div");
-    div.className = `chat-message ${who}`;
-    div.textContent = text;
-    chatLog.appendChild(div);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-
-  function replyToUser(msg) {
-    const lower = msg.toLowerCase();
-    if (lower.includes("control") || lower.includes("how")) {
-      addMessage(
-        "Use ← / → / ↑ / ↓ or W/A/S/D to walk and Space to charge. Push the opponent out of the ring!",
-        "bot"
-      );
-    } else if (lower.includes("こんにちは") || lower.includes("konnichiwa")) {
-      addMessage("こんにちは！元気ですか？ Ready to wrestle?", "bot");
-    } else {
-      addMessage("I’m a simple ringside coach. Ask me about controls or basics!", "bot");
-    }
-  }
-
-  chatSend.addEventListener("click", () => {
-    const txt = chatInput.value.trim();
-    if (!txt) return;
-    addMessage(txt, "user");
-    chatInput.value = "";
-    replyToUser(txt);
+    plus.addEventListener("click", () => {
+      if (remaining > 0) {
+        statState[name]++;
+        remaining--;
+        valueSpan.textContent = statState[name];
+        remainingSpan.textContent = remaining;
+      }
+    });
+    btns.appendChild(minus);
+    btns.appendChild(plus);
+    row.appendChild(label);
+    row.appendChild(valueSpan);
+    row.appendChild(btns);
+    statControls.appendChild(row);
   });
 
-  chatInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      chatSend.click();
-    }
+  ["bodyTypeSelect","hairStyleSelect","shirtStyleSelect","pantsStyleSelect",
+   "eyeShapeSelect","mouthShapeSelect",
+   "skinColorPicker","hairColorPicker","mawashiColorPicker"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const key = "sumo_" + id;
+    const stored = localStorage.getItem(key);
+    if (stored) el.value = stored;
+    const update = () => {
+      localStorage.setItem(key, el.value);
+      drawProfileCharacter();
+    };
+    el.addEventListener("change", update);
+    el.addEventListener("input", update);
   });
+
+  drawProfileCharacter();
+  updateLevelFromXP();
 }
 
-// ========== MINI-SLOTS ==========
-function setupMiniSlots() {
-  const spinButton = document.getElementById("slotsSpinButton");
-  const msg = document.getElementById("slotsMessage");
-  const s1 = document.getElementById("slot1");
-  const s2 = document.getElementById("slot2");
-  const s3 = document.getElementById("slot3");
-  if (!spinButton || !msg || !s1 || !s2 || !s3) return;
-
-  const symbols = ["🍙", "🥋", "🍶", "🍡", "🥢"];
-
-  spinButton.addEventListener("click", () => {
-    const a = randomChoice(symbols);
-    const b = randomChoice(symbols);
-    const c = randomChoice(symbols);
-    s1.textContent = a;
-    s2.textContent = b;
-    s3.textContent = c;
-    if (a === b && b === c) {
-      msg.textContent = "JACKPOT! Triple match!";
-    } else if (a === b || b === c || a === c) {
-      msg.textContent = "Nice! Double match!";
-    } else {
-      msg.textContent = "No match – try again!";
-    }
-  });
-}
-
-function randomChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-// ========== STATS (LOCAL) ==========
-function setupStats() {
-  const statsList = document.getElementById("statsList");
-  if (!statsList) return;
-
-  const stats = JSON.parse(localStorage.getItem("sumoStats") || "{}");
-  const bouts = stats.bouts || 0;
-  const wins = stats.wins || 0;
-  const losses = bouts - wins;
-  const bestStreak = stats.bestStreak || 0;
-
-  const items = [
-    `Total bouts: ${bouts}`,
-    `Wins: ${wins}`,
-    `Losses: ${losses < 0 ? 0 : losses}`,
-    `Best winning streak: ${bestStreak}`,
-  ];
-
-  statsList.innerHTML = "";
-  items.forEach((t) => {
-    const li = document.createElement("li");
-    li.textContent = t;
-    statsList.appendChild(li);
-  });
-}
-
-// ========== SUMO GAME ENGINE (CANVAS) ==========
-let canvas, ctx, msgBar, hpPlayerEl, hpCpuEl;
-
-const sumoState = {
-  player: null,
-  cpu: null,
-  ref: null,
-  crowd: [],
-  pushEffect: { active: false, x: 0, y: 0, scale: 0 },
-  keys: {},
-  ringRadius: 170,
-  boutOver: false,
-  time: 0,
-};
-
-function initSumoGame() {
-  canvas = document.getElementById("sumoCanvas");
+function drawProfileCharacter() {
+  const canvas = document.getElementById("profileCanvas");
   if (!canvas) return;
-  ctx = canvas.getContext("2d");
-  msgBar = document.getElementById("msgBar");
-  hpPlayerEl = document.getElementById("hpPlayer");
-  hpCpuEl = document.getElementById("hpCpu");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 + 40;
+  const skin = document.getElementById("skinColorPicker")?.value || "#f3d0a0";
+  const hair = document.getElementById("hairColorPicker")?.value || "#2c1b12";
+  const mawashi = document.getElementById("mawashiColorPicker")?.value || "#e74c3c";
 
-  sumoState.player = {
-    x: cx - 90,
-    y: cy,
-    vx: 0,
-    vy: 0,
-    facing: 1,
-    stamina: 100,
-    anim: "idle",
-    phase: Math.random() * Math.PI * 2,
-    pushCooldown: 0,
-  };
-
-  sumoState.cpu = {
-    x: cx + 90,
-    y: cy,
-    vx: 0,
-    vy: 0,
-    facing: -1,
-    stamina: 100,
-    anim: "idle",
-    phase: Math.random() * Math.PI * 2,
-    aiTimer: 0.5,
-    pushCooldown: 0,
-  };
-
-  sumoState.ref = {
-    x: cx,
-    y: cy - 30,
-    phase: 0,
-  };
-
-  // Circular stands crowd
-  sumoState.crowd = [];
-  const ringR = sumoState.ringRadius;
-  const innerStandR = ringR + 40;
-  const outerStandR = ringR + 80;
-  const fanCount = 48;
-  for (let i = 0; i < fanCount; i++) {
-    const angle = (i / fanCount) * Math.PI * 2;
-    const r = innerStandR + Math.random() * (outerStandR - innerStandR);
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * (r * 0.55); // squash vertically for perspective
-    sumoState.crowd.push({
-      x,
-      yBase: y,
-      amp: 4 + Math.random() * 4,
-      phase: Math.random() * Math.PI * 2,
-      shirtColor: randomChoice(["#e74c3c", "#3498db", "#9b59b6", "#1abc9c", "#f1c40f"]),
-      pantColor: randomChoice(["#2c3e50", "#34495e", "#1f2a3a"]),
-      height: 32 + Math.random() * 10,
-    });
-  }
-
-  document.addEventListener("keydown", (e) => {
-    const key = e.key.toLowerCase();
-    sumoState.keys[key] = true;
-    if (e.code === "Space") e.preventDefault();
-  });
-  document.addEventListener("keyup", (e) => {
-    const key = e.key.toLowerCase();
-    sumoState.keys[key] = false;
-  });
-
-  canvas.addEventListener("click", () => {
-    if (sumoState.boutOver) resetBout();
-  });
-
-  resetBout();
-  lastTime = 0;
-  requestAnimationFrame(gameLoop);
-}
-
-function setGameMessage(text) {
-  if (msgBar) msgBar.textContent = text;
-}
-
-function resetBout() {
-  const { player, cpu } = sumoState;
-  if (!player || !cpu || !canvas) return;
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 + 40;
-
-  player.x = cx - 90;
-  player.y = cy;
-  cpu.x = cx + 90;
-  cpu.y = cy;
-  player.stamina = 100;
-  cpu.stamina = 100;
-  player.vx = cpu.vx = 0;
-  player.vy = cpu.vy = 0;
-  player.anim = cpu.anim = "idle";
-  player.pushCooldown = cpu.pushCooldown = 0;
-  sumoState.boutOver = false;
-  setGameMessage("Move with ← → / ↑ ↓ or W/A/S/D, Space to charge. Push opponent out of the ring!");
-}
-
-// ========== GAME LOOP ==========
-let lastTime = 0;
-
-function gameLoop(timestamp) {
-  if (!canvas) return;
-  if (!lastTime) lastTime = timestamp;
-  const dt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-  sumoState.time += dt;
-
-  updateGame(dt);
-  drawGame();
-
-  requestAnimationFrame(gameLoop);
-}
-
-function updateGame(dt) {
-  if (!ctx) return;
-  const { player, cpu } = sumoState;
-  if (!player || !cpu) return;
-
-  if (!sumoState.boutOver) {
-    handlePlayerInput(player, dt);
-    handleCpuAI(cpu, dt, player);
-    handlePhysics(player, cpu, dt);
-  }
-
-  player.pushCooldown = Math.max(0, player.pushCooldown - dt);
-  cpu.pushCooldown = Math.max(0, cpu.pushCooldown - dt);
-
-  updateUI(player, cpu);
-}
-
-function handlePlayerInput(p, dt) {
-  const speed = 180;
-  let dx = 0;
-  let dy = 0;
-
-  if (sumoState.keys["arrowleft"] || sumoState.keys["a"]) dx -= 1;
-  if (sumoState.keys["arrowright"] || sumoState.keys["d"]) dx += 1;
-  if (sumoState.keys["arrowup"] || sumoState.keys["w"]) dy -= 1;
-  if (sumoState.keys["arrowdown"] || sumoState.keys["s"]) dy += 1;
-
-  if (dx !== 0 || dy !== 0) {
-    const len = Math.hypot(dx, dy) || 1;
-    dx /= len;
-    dy /= len;
-    p.vx = dx * speed;
-    p.vy = dy * speed;
-    if (dx !== 0) p.facing = dx > 0 ? 1 : -1;
-    if (p.anim === "idle") p.anim = "walk";
-  } else {
-    p.vx = 0;
-    p.vy = 0;
-    if (p.anim === "walk") p.anim = "idle";
-  }
-
-  if ((sumoState.keys[" "] || sumoState.keys["space"]) && p.pushCooldown <= 0) {
-    p.anim = "charge";
-    attemptClash(false);
-    p.pushCooldown = 0.4;
-  }
-}
-
-function handleCpuAI(c, dt, player) {
-  c.aiTimer -= dt;
-  const speed = 160;
-
-  let targetX = player.x;
-  let targetY = player.y;
-
-  const dist = Math.hypot(targetX - c.x, targetY - c.y);
-
-  if (dist > 150) {
-    const dx = targetX - c.x;
-    const dy = targetY - c.y;
-    const len = Math.hypot(dx, dy) || 1;
-    c.vx = (dx / len) * speed;
-    c.vy = (dy / len) * speed;
-  } else if (dist < 120) {
-    const dx = c.x - targetX;
-    const dy = c.y - targetY;
-    const len = Math.hypot(dx, dy) || 1;
-    c.vx = (dx / len) * speed * 0.3;
-    c.vy = (dy / len) * speed * 0.3;
-  } else {
-    c.vx = 0;
-    c.vy = 0;
-  }
-
-  if (c.vx !== 0) c.facing = c.vx > 0 ? 1 : -1;
-  if (c.vx !== 0 || c.vy !== 0) {
-    if (c.anim === "idle") c.anim = "walk";
-  } else if (c.anim === "walk") {
-    c.anim = "idle";
-  }
-
-  if (c.aiTimer <= 0 && c.pushCooldown <= 0) {
-    if (dist < 220) {
-      c.anim = "charge";
-      attemptClash(true);
-      c.pushCooldown = 0.5;
-      c.aiTimer = 1.0 + Math.random() * 0.7;
-    } else {
-      c.aiTimer = 0.4 + Math.random() * 0.3;
-    }
-  }
-}
-
-function handlePhysics(p, c, dt) {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 + 40;
-  const maxR = sumoState.ringRadius - 20;
-
-  p.x += p.vx * dt;
-  p.y += p.vy * dt;
-  c.x += c.vx * dt;
-  c.y += c.vy * dt;
-
-  // clamp inside ring
-  let pr = Math.hypot(p.x - cx, p.y - cy);
-  if (pr > maxR) {
-    const ratio = maxR / pr;
-    p.x = cx + (p.x - cx) * ratio;
-    p.y = cy + (p.y - cy) * ratio;
-  }
-
-  let cr = Math.hypot(c.x - cx, c.y - cy);
-  if (cr > maxR) {
-    const ratio = maxR / cr;
-    c.x = cx + (c.x - cx) * ratio;
-    c.y = cy + (c.y - cy) * ratio;
-  }
-
-  // check ring-out
-  if (!sumoState.boutOver) {
-    const pOff = Math.hypot(p.x - cx, p.y - cy);
-    const cOff = Math.hypot(c.x - cx, c.y - cy);
-    const margin = 10;
-    if (p.stamina <= 0 || pOff > maxR + margin) {
-      endBout("cpu");
-    } else if (c.stamina <= 0 || cOff > maxR + margin) {
-      endBout("player");
-    }
-  }
-
-  if (sumoState.pushEffect.active) {
-    sumoState.pushEffect.scale += dt * 2.2;
-    if (sumoState.pushEffect.scale > 1.5) {
-      sumoState.pushEffect.active = false;
-    }
-  }
-}
-
-function attemptClash(cpuInitiated) {
-  const { player, cpu } = sumoState;
-  if (sumoState.boutOver || !canvas) return;
-
-  const dist = Math.hypot(player.x - cpu.x, player.y - cpu.y);
-  if (dist > 190) return;
-
-  sumoState.pushEffect.active = true;
-  sumoState.pushEffect.x = (player.x + cpu.x) / 2;
-  sumoState.pushEffect.y = (player.y + cpu.y) / 2;
-  sumoState.pushEffect.scale = 0.3;
-
-  const base = 15 + Math.random() * 20;
-  const playerRoll = base + (cpuInitiated ? 0 : 10) + Math.random() * 20;
-  const cpuRoll = base + (cpuInitiated ? 12 : 2) + Math.random() * 20;
-
-  let winner;
-  let diff;
-  if (playerRoll > cpuRoll) {
-    winner = "player";
-    diff = playerRoll - cpuRoll;
-  } else {
-    winner = "cpu";
-    diff = cpuRoll - playerRoll;
-  }
-
-  const push = diff * 1.4;
-  const angle = Math.atan2(cpu.y - player.y, cpu.x - player.x);
-
-  if (winner === "player") {
-    cpu.x += Math.cos(angle) * push;
-    cpu.y += Math.sin(angle) * push;
-    cpu.stamina -= diff * 1.2;
-    setGameMessage("You drive the opponent back!");
-    player.anim = "push";
-  } else {
-    player.x -= Math.cos(angle) * push;
-    player.y -= Math.sin(angle) * push;
-    player.stamina -= diff * 1.2;
-    setGameMessage("You are forced toward the edge!");
-    cpu.anim = "push";
-  }
-}
-
-function endBout(winner) {
-  sumoState.boutOver = true;
-  const stats = JSON.parse(localStorage.getItem("sumoStats") || "{}");
-  stats.bouts = (stats.bouts || 0) + 1;
-  if (winner === "player") {
-    stats.wins = (stats.wins || 0) + 1;
-    stats.currentStreak = (stats.currentStreak || 0) + 1;
-    stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak || 0);
-    setGameMessage("You win! Click the ring to start a new bout.");
-  } else {
-    stats.currentStreak = 0;
-    setGameMessage("CPU wins. Click the ring to try again.");
-  }
-  localStorage.setItem("sumoStats", JSON.stringify(stats));
-  setupStats();
-  updateGameLeaderboard();
-}
-
-// ========== DRAWING ==========
-function drawGame() {
-  if (!ctx) return;
-  const { player, cpu } = sumoState;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawStands();
-  drawCrowd();
-  drawDohyo();
-  drawReferee();
-  drawFighter(player, "#e74c3c", true);
-  drawFighter(cpu, "#3498db", false);
-  drawPushCircle();
-}
-
-function drawStands() {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 + 40;
-  const rOuter = sumoState.ringRadius + 90;
-  const rMid = sumoState.ringRadius + 60;
-
-  const grd = ctx.createRadialGradient(cx, cy - 60, 40, cx, cy - 40, rOuter);
-  grd.addColorStop(0, "#1f2536");
-  grd.addColorStop(1, "#05060b");
-  ctx.fillStyle = grd;
-
-  ctx.beginPath();
-  ctx.ellipse(cx, cy - 20, rOuter, rOuter * 0.55, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#20263a";
-  ctx.beginPath();
-  ctx.ellipse(cx, cy - 10, rMid, rMid * 0.5, 0, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function drawCrowd() {
-  const t = sumoState.time;
-  const crowd = sumoState.crowd;
-  for (const f of crowd) {
-    const y = f.yBase + Math.sin(t * 2 + f.phase) * f.amp;
-    const h = f.height;
-    const x = f.x;
-
-    const torsoHeight = h * 0.45;
-    const legHeight = h * 0.35;
-    const headRadius = h * 0.2;
-    const torsoTop = y - torsoHeight;
-    const headCenterY = torsoTop - headRadius - 2;
-
-    // legs
-    ctx.fillStyle = f.pantColor;
-    const legWidth = 6;
-    ctx.fillRect(x - legWidth - 3, y - legHeight, legWidth, legHeight);
-    ctx.fillRect(x + 3, y - legHeight, legWidth, legHeight);
-
-    // feet
-    ctx.fillStyle = "#111";
-    ctx.fillRect(x - legWidth - 4, y - 4, legWidth + 2, 4);
-    ctx.fillRect(x + 2, y - 4, legWidth + 2, 4);
-
-    // torso
-    ctx.fillStyle = f.shirtColor;
-    ctx.fillRect(x - 9, torsoTop, 18, torsoHeight);
-
-    // arms
-    ctx.fillStyle = "#f3d5b5";
-    ctx.fillRect(x - 15, torsoTop + 4, 6, torsoHeight - 6);
-    ctx.fillRect(x + 9, torsoTop + 4, 6, torsoHeight - 6);
-
-    // hands
-    ctx.beginPath();
-    ctx.arc(x - 12, torsoTop + torsoHeight, 3, 0, Math.PI * 2);
-    ctx.arc(x + 12, torsoTop + torsoHeight, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // head
-    ctx.fillStyle = "#f3d5b5";
-    ctx.beginPath();
-    ctx.arc(x, headCenterY, headRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    // hair
-    ctx.fillStyle = "#2c2b30";
-    ctx.beginPath();
-    ctx.arc(x, headCenterY - headRadius * 0.3, headRadius, Math.PI, 0);
-    ctx.fill();
-
-    // ears
-    ctx.beginPath();
-    ctx.arc(x - headRadius, headCenterY, headRadius * 0.35, 0, Math.PI * 2);
-    ctx.arc(x + headRadius, headCenterY, headRadius * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-
-    // face
-    ctx.fillStyle = "#000";
-    ctx.beginPath();
-    ctx.arc(x - headRadius * 0.4, headCenterY - 2, 1.4, 0, Math.PI * 2);
-    ctx.arc(x + headRadius * 0.4, headCenterY - 2, 1.4, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = "#b03030";
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(x, headCenterY + 2, headRadius * 0.5, 0.1 * Math.PI, 0.9 * Math.PI);
-    ctx.stroke();
-  }
-}
-
-function drawDohyo() {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2 + 40;
-  const rOuter = sumoState.ringRadius + 20;
-  const rInner = sumoState.ringRadius;
-
-  const grd = ctx.createRadialGradient(cx, cy, 20, cx, cy, rOuter);
-  grd.addColorStop(0, "#cfa36a");
-  grd.addColorStop(1, "#7f5b2f");
-  ctx.fillStyle = grd;
-  ctx.beginPath();
-  ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#f8e0b0";
-  ctx.lineWidth = 12;
-  ctx.beginPath();
-  ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
-  ctx.stroke();
-
-  ctx.fillStyle = "#f8e8d0";
-  ctx.fillRect(cx - 60, cy - 4, 40, 8);
-  ctx.fillRect(cx + 20, cy - 4, 40, 8);
-}
-
-function drawReferee() {
-  const ref = sumoState.ref;
-  const t = sumoState.time;
-  const bob = Math.sin(t * 3) * 2;
-
-  const x = ref.x;
-  const y = ref.y + bob;
-
-  // legs
-  ctx.fillStyle = "#2c3e50";
-  ctx.fillRect(x - 7, y + 30, 6, 20);
-  ctx.fillRect(x + 1, y + 30, 6, 20);
-
-  ctx.fillStyle = "#111";
-  ctx.fillRect(x - 8, y + 48, 8, 4);
-  ctx.fillRect(x + 1, y + 48, 8, 4);
-
-  // torso (kimono)
-  ctx.fillStyle = "#b83232";
-  ctx.fillRect(x - 12, y, 24, 34);
-
-  // arms
-  ctx.fillStyle = "#f1d2aa";
-  ctx.fillRect(x - 18, y + 4, 6, 22);
-  ctx.fillRect(x + 12, y + 4, 6, 22);
-
-  // hands
-  ctx.beginPath();
-  ctx.arc(x - 15, y + 26, 3, 0, Math.PI * 2);
-  ctx.arc(x + 15, y + 26, 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  // head
-  ctx.fillStyle = "#f1d2aa";
-  ctx.beginPath();
-  ctx.arc(x, y - 18, 12, 0, Math.PI * 2);
-  ctx.fill();
-
-  // ears
-  ctx.beginPath();
-  ctx.arc(x - 12, y - 18, 3, 0, Math.PI * 2);
-  ctx.arc(x + 12, y - 18, 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  // hair hat
-  ctx.fillStyle = "#11131a";
-  ctx.beginPath();
-  ctx.moveTo(x - 14, y - 26);
-  ctx.lineTo(x + 14, y - 26);
-  ctx.lineTo(x, y - 44);
-  ctx.closePath();
-  ctx.fill();
-
-  // face
-  ctx.fillStyle = "#000";
-  ctx.beginPath();
-  ctx.arc(x - 4, y - 20, 2, 0, Math.PI * 2);
-  ctx.arc(x + 4, y - 20, 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#a03030";
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.arc(x, y - 14, 5, 0.1 * Math.PI, 0.9 * Math.PI);
-  ctx.stroke();
-
-  // waving flag arm
-  ctx.strokeStyle = "#f1d2aa";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  const armAngle = Math.sin(t * 4) * 0.7;
-  const ax1 = x + 15;
-  const ay1 = y + 12;
-  const armLen = 22;
-  const ax2 = ax1 + armLen * Math.cos(armAngle);
-  const ay2 = ay1 + armLen * Math.sin(armAngle);
-  ctx.moveTo(ax1, ay1);
-  ctx.lineTo(ax2, ay2);
-  ctx.stroke();
-
-  // little flag
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.moveTo(ax2, ay2);
-  ctx.lineTo(ax2 + 8, ay2 - 4);
-  ctx.lineTo(ax2 + 8, ay2 + 4);
-  ctx.closePath();
-  ctx.fill();
-}
-
-function drawFighter(f, beltColor, isPlayer) {
-  const t = sumoState.time;
-  const cx = f.x;
-  const cy = f.y;
-  const wobble = Math.sin(t * 4 + f.phase) * 3;
-
-  const facing = f.facing || 1;
   ctx.save();
-  ctx.translate(cx, cy + wobble);
-  if (facing < 0) ctx.scale(-1, 1);
+  ctx.translate(canvas.width/2, canvas.height/2);
 
-  // Scale for full body
-  const bodyWidth = 36;
-  const bodyHeight = 42;
-  const legHeight = 24;
-  const headRadius = 18;
-
-  // legs
-  ctx.fillStyle = "#f3d0a0";
-  ctx.fillRect(-bodyWidth * 0.4, 20, 10, legHeight);
-  ctx.fillRect(bodyWidth * 0.1, 20, 10, legHeight);
-
-  // feet
+  ctx.fillStyle = skin;
+  ctx.fillRect(-10, 20, 12, 30);
+  ctx.fillRect(-2, 20, 12, 30);
   ctx.fillStyle = "#111";
-  ctx.fillRect(-bodyWidth * 0.42, 20 + legHeight, 14, 5);
-  ctx.fillRect(bodyWidth * 0.08, 20 + legHeight, 14, 5);
+  ctx.fillRect(-12, 48, 16, 6);
+  ctx.fillRect(-2, 48, 16, 6);
 
-  // torso
-  ctx.fillStyle = "#f3d0a0";
+  ctx.fillStyle = skin;
+  ctx.fillRect(-18, -10, 36, 34);
+
+  ctx.fillStyle = "#c98a7a";
   ctx.beginPath();
-  ctx.moveTo(-bodyWidth * 0.5, -4);
-  ctx.lineTo(bodyWidth * 0.5, -4);
-  ctx.quadraticCurveTo(bodyWidth * 0.7, 20, bodyWidth * 0.4, 32);
-  ctx.lineTo(-bodyWidth * 0.4, 32);
-  ctx.quadraticCurveTo(-bodyWidth * 0.7, 20, -bodyWidth * 0.5, -4);
-  ctx.closePath();
+  ctx.arc(-8, 2, 2, 0, Math.PI * 2);
+  ctx.arc(8, 2, 2, 0, Math.PI * 2);
   ctx.fill();
 
-  // belt / mawashi
-  ctx.fillStyle = beltColor;
-  ctx.fillRect(-bodyWidth * 0.6, 10, bodyWidth * 1.2, 14);
+  ctx.fillStyle = mawashi;
+  ctx.fillRect(-18, 16, 36, 12);
 
-  // arms
-  ctx.fillStyle = "#f3d0a0";
-  let armRaise = 0;
-  if (f.anim === "charge" || f.anim === "push") {
-    armRaise = -10;
-  } else if (f.anim === "walk") {
-    armRaise = Math.sin(t * 8 + f.phase) * 6;
-  }
-
-  ctx.fillRect(-bodyWidth * 0.8, 0 + armRaise, 10, 24);
-  ctx.fillRect(bodyWidth * 0.7, 0 + armRaise, 10, 24);
-
-  // hands
+  ctx.fillStyle = skin;
   ctx.beginPath();
-  ctx.arc(-bodyWidth * 0.75 + 5, 24 + armRaise, 5, 0, Math.PI * 2);
-  ctx.arc(bodyWidth * 0.75 + 5, 24 + armRaise, 5, 0, Math.PI * 2);
+  ctx.rect(-28, -8, 10, 26);
+  ctx.rect(18, -8, 10, 26);
   ctx.fill();
 
-  // head
-  ctx.fillStyle = "#f3d0a0";
   ctx.beginPath();
-  ctx.arc(0, -20, headRadius, 0, Math.PI * 2);
+  ctx.arc(0, -22, 14, 0, Math.PI * 2);
   ctx.fill();
 
-  // ears
+  ctx.fillStyle = hair;
   ctx.beginPath();
-  ctx.arc(-headRadius, -20, 4, 0, Math.PI * 2);
-  ctx.arc(headRadius, -20, 4, 0, Math.PI * 2);
+  ctx.arc(0, -26, 14, Math.PI, 0);
   ctx.fill();
 
-  // top knot hair
-  ctx.fillStyle = "#1b1411";
-  ctx.beginPath();
-  ctx.arc(0, -32, 10, 0, Math.PI * 2);
-  ctx.fill();
-
-  // face
   ctx.fillStyle = "#000";
   ctx.beginPath();
-  ctx.arc(-6, -22, 2.2, 0, Math.PI * 2);
-  ctx.arc(6, -22, 2.2, 0, Math.PI * 2);
+  ctx.arc(-5, -24, 2, 0, Math.PI * 2);
+  ctx.arc(5, -24, 2, 0, Math.PI * 2);
   ctx.fill();
 
-  const tired = f.stamina < 35;
-  ctx.strokeStyle = "#a03030";
-  ctx.lineWidth = tired ? 3 : 2;
   ctx.beginPath();
-  if (isPlayer) {
-    ctx.arc(0, -16, tired ? 6 : 8, 0.1 * Math.PI, 0.9 * Math.PI);
-  } else {
-    ctx.arc(0, -16, tired ? 6 : 8, 1.1 * Math.PI, 1.9 * Math.PI);
-  }
+  ctx.moveTo(-6, -18);
+  ctx.quadraticCurveTo(0, -16, 6, -18);
+  ctx.strokeStyle = "#a03030";
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   ctx.restore();
 }
 
-function drawPushCircle() {
-  if (!sumoState.pushEffect.active) return;
-  const { x, y, scale } = sumoState.pushEffect;
-  ctx.save();
-  const radius = 40 * scale;
-  ctx.globalAlpha = 0.7 * (1.5 - scale);
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function updateUI(player, cpu) {
-  if (!hpPlayerEl || !hpCpuEl) return;
-  hpPlayerEl.style.width = Math.max(0, player.stamina) + "%";
-  hpCpuEl.style.width = Math.max(0, cpu.stamina) + "%";
-}
-
-// ========== GAME LEADERBOARD (LOCAL) ==========
-function updateGameLeaderboard() {
-  const tbody = document.getElementById("gameLeaderboardBody");
-  if (!tbody) return;
-
-  const stats = JSON.parse(localStorage.getItem("sumoStats") || "{}");
-  const displayName = getDisplayName();
-  const bouts = stats.bouts || 0;
-  const wins = stats.wins || 0;
-
-  const rows = [
-    {
-      rank: 1,
-      name: displayName,
-      wins,
-      bouts,
-    },
-  ];
-
-  tbody.innerHTML = "";
-  rows.forEach((r) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.rank}</td>
-      <td>${r.name}</td>
-      <td>${r.wins}</td>
-      <td>${r.bouts}</td>
-    `;
-    tbody.appendChild(tr);
+function showProfileSubTab(which) {
+  const panels = {
+    stats: document.getElementById("profileStatsPanel"),
+    items: document.getElementById("profileItemsPanel"),
+    campaign: document.getElementById("profileCampaignPanel"),
+    checkout: document.getElementById("profileCheckoutPanel")
+  };
+  const tabs = {
+    stats: document.getElementById("profileStatsTab"),
+    items: document.getElementById("profileItemsTab"),
+    campaign: document.getElementById("profileCampaignTab"),
+    checkout: document.getElementById("profileCheckoutTab")
+  };
+  Object.keys(panels).forEach(key => {
+    if (!panels[key] || !tabs[key]) return;
+    if (key === which) {
+      panels[key].classList.add("active");
+      tabs[key].classList.add("active");
+    } else {
+      panels[key].classList.remove("active");
+      tabs[key].classList.remove("active");
+    }
   });
 }
+
+function updateLevelFromXP() {
+  const xp = parseInt(localStorage.getItem("sumoXP") || "0", 10);
+  const xpSpan = document.getElementById("currentXP");
+  const lvlSpan = document.getElementById("currentLevel");
+  const bar = document.getElementById("levelBarFill");
+  if (!xpSpan || !lvlSpan || !bar) return;
+  xpSpan.textContent = xp;
+  let level = 1;
+  for (let i = 0; i < XP_THRESHOLDS.length; i++) {
+    if (xp >= XP_THRESHOLDS[i]) level = i + 1;
+  }
+  lvlSpan.textContent = level;
+  const maxXP = XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
+  const percent = Math.max(0, Math.min(100, (xp / maxXP) * 100));
+  bar.style.width = percent + "%";
+}
+
+function openSettingsModal() {
+  const modal = document.getElementById("settingsModal");
+  if (modal) modal.classList.add("active");
+}
+function closeSettingsModal() {
+  const modal = document.getElementById("settingsModal");
+  if (modal) modal.classList.remove("active");
+}
+
+// DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("pushSpinBtn");
+  if (btn) btn.addEventListener("click", spinReels);
+  const select = document.getElementById("reelCountSelect");
+  if (select) select.addEventListener("change", buildReels);
+  initLanguage();
+  initVisitorCounters();
+  initHomeIfPresent();
+  initProfileIfPresent();
+});
