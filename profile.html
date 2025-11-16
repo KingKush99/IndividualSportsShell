@@ -1,270 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sumo Showdown Hub - Profile</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Profile • Sumo Sumo Arena</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="profile-body">
-  <header class="main-header">
-    <button class="circle-btn profile-btn" onclick="window.location.href='index.html'">
-      <span class="icon">🏠</span>
-    </button>
-    <h1 class="site-title" data-i18n="profileTitle">Profile & Fighters</h1>
-    <button class="circle-btn settings-btn" onclick="openSettingsModal()">⚙️</button>
+<body class="theme-dark">
+  <header class="profile-header">
+    <button class="circle-btn back-btn" onclick="window.location.href='index.html'">⟵</button>
+    <div class="profile-username" id="profileUsernameHeader">SumoUser123</div>
+    <button class="circle-btn settings-btn" onclick="openSettingsModal()">⚙</button>
   </header>
 
   <main class="profile-main">
-    <section class="character-customization">
-      <h2 data-i18n="customizeHeader">Character Customization</h2>
-      <div class="customization-layout">
-        <div class="customization-controls">
-          <label data-i18n="nameLabel">Username (changes 1× per week)</label>
-          <input id="usernameInput" maxlength="64">
-
-          <label data-i18n="displayNameLabel">Display Name</label>
-          <input id="displayNameInput" maxlength="64">
-
-          <p class="small-note" data-i18n="displayNameNote">Display name appears in game and profile, username appears on leaderboards.</p>
-
-          <hr>
-
-          <h3 data-i18n="appearanceHeader">Appearance</h3>
-
-          <label data-i18n="bodyType">Body Type</label>
-          <select id="bodyTypeSelect">
-            <option value="classic" data-i18n="bodyClassic">Classic</option>
-            <option value="heavy" data-i18n="bodyHeavy">Heavy</option>
-            <option value="lean" data-i18n="bodyLean">Lean</option>
-          </select>
-
-          <label data-i18n="hairStyle">Hair Style</label>
-          <select id="hairStyleSelect">
-            <option value="topknot">Topknot</option>
-            <option value="short">Short</option>
-            <option value="bald">Bald</option>
-          </select>
-
-          <label data-i18n="shirtStyle">Shirt Style</label>
-          <select id="shirtStyleSelect">
-            <option value="none">None</option>
-            <option value="tank">Tank</option>
-            <option value="robe">Robe</option>
-          </select>
-
-          <label data-i18n="pantsStyle">Pants Style</label>
-          <select id="pantsStyleSelect">
-            <option value="mawashi">Mawashi</option>
-            <option value="shorts">Shorts</option>
-            <option value="pants">Pants</option>
-          </select>
-
-          <label data-i18n="eyeShape">Eye Shape</label>
-          <select id="eyeShapeSelect">
-            <option value="normal">Normal</option>
-            <option value="narrow">Narrow</option>
-            <option value="wide">Wide</option>
-          </select>
-
-          <label data-i18n="mouthShape">Mouth Shape</label>
-          <select id="mouthShapeSelect">
-            <option value="neutral">Neutral</option>
-            <option value="smile">Smile</option>
-            <option value="frown">Frown</option>
-          </select>
-
-          <h3 data-i18n="colorsHeader">Colors</h3>
-          <label data-i18n="skinColor">Skin</label>
-          <input type="color" id="skinColorPicker" value="#f3d0a0">
-          <label data-i18n="hairColor">Hair</label>
-          <input type="color" id="hairColorPicker" value="#2c1b12">
-          <label data-i18n="mawashiColor">Mawashi</label>
-          <input type="color" id="mawashiColorPicker" value="#e74c3c">
+    <!-- Top Instagram-style row -->
+    <section class="profile-top-row">
+      <div class="profile-avatar-block">
+        <div class="profile-avatar" id="profileAvatarPreview"></div>
+        <label class="avatar-upload">
+          Change
+          <input type="file" id="avatarInput" accept="image/*" />
+        </label>
+      </div>
+      <div class="profile-meta">
+        <div class="profile-name-bio">
+          <h1 id="profileUsernameView">SumoUser123</h1>
+          <textarea id="profileBio" maxlength="264" placeholder="Write your bio (max 264 characters)..."></textarea>
         </div>
-
-        <div class="character-preview-column">
-          <canvas id="profileCanvas" width="260" height="280"></canvas>
-
-          <div class="stats-block">
-            <h3 data-i18n="skillPointsHeader">Skill Points</h3>
-            <p><span data-i18n="availablePoints">Available:</span> <span id="skillPointsRemaining">9</span></p>
-            <div id="statControls"></div>
+        <div class="profile-follow-row">
+          <button class="follow-pill" onclick="toggleFollowDropdown('followers')">
+            <span id="followersCount">128</span> Followers ▼
+          </button>
+          <button class="follow-pill" onclick="toggleFollowDropdown('following')">
+            <span id="followingCount">87</span> Following ▼
+          </button>
+          <button class="follow-pill" onclick="toggleFollowDropdown('friends')">
+            <span id="friendsCount">34</span> Friends ▼
+          </button>
+        </div>
+        <div class="follow-dropdowns">
+          <div id="followersDropdown" class="follow-dropdown hidden">
+            <input type="text" placeholder="Search Followers..." oninput="filterFollowList('followers', this.value)" />
+            <ul id="followersList"></ul>
+          </div>
+          <div id="followingDropdown" class="follow-dropdown hidden">
+            <input type="text" placeholder="Search Following..." oninput="filterFollowList('following', this.value)" />
+            <ul id="followingList"></ul>
+          </div>
+          <div id="friendsDropdown" class="follow-dropdown hidden">
+            <input type="text" placeholder="Search Friends..." oninput="filterFollowList('friends', this.value)" />
+            <ul id="friendsList"></ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="profile-tabs-section">
-      <div class="tabs">
-        <button class="tab active" id="profileStatsTab" onclick="showProfileSubTab('stats')" data-i18n="subTabStats">Stats</button>
-        <button class="tab" id="profileItemsTab" onclick="showProfileSubTab('items')" data-i18n="subTabItems">Items</button>
-        <button class="tab" id="profileCampaignTab" onclick="showProfileSubTab('campaign')" data-i18n="subTabCampaign">Campaign</button>
-        <button class="tab" id="profileCheckoutTab" onclick="showProfileSubTab('checkout')" data-i18n="subTabCheckout">Checkout</button>
+    <!-- Level bar -->
+    <section class="level-section">
+      <div class="level-label">
+        Level <span id="currentLevel">0</span>
       </div>
+      <div class="level-bar">
+        <div id="levelProgress" class="level-progress"></div>
+      </div>
+      <div class="level-xp">
+        <span id="currentXP">0</span> XP
+      </div>
+    </section>
 
-      <div id="profileStatsPanel" class="profile-panel active">
-        <h3 data-i18n="progressHeader">Progress</h3>
-        <div class="level-info">
-          <span data-i18n="currentLevel">Level</span> <span id="currentLevel">1</span>
-          <span class="xp-label">(XP: <span id="currentXP">0</span>)</span>
-        </div>
-        <div class="level-bar-wrapper">
-          <div class="level-bar-bg">
-            <div id="levelBarFill" class="level-bar-fill"></div>
+    <section class="profile-content-row">
+      <!-- LEFT: Character Customization -->
+      <section class="customization-card">
+        <h2>Character Customization</h2>
+        <div class="customization-body">
+          <div class="customization-preview">
+            <canvas id="avatarCanvas" width="220" height="260"></canvas>
+            <button class="rotate-btn" onclick="rotateAvatar()">Rotate</button>
           </div>
-          <div class="level-markers">
-            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+          <div class="customization-controls">
+            <div class="control-group">
+              <label>Body Type</label>
+              <select id="bodyTypeSelect">
+                <option value="classic">Classic</option>
+                <option value="wide">Wide</option>
+                <option value="tall">Tall</option>
+                <option value="compact">Compact</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Hair Style</label>
+              <select id="hairStyleSelect">
+                <option value="topknot">Topknot</option>
+                <option value="short">Short</option>
+                <option value="long">Long</option>
+                <option value="bald">Bald</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Shirt Style</label>
+              <select id="shirtStyleSelect">
+                <option value="robe">Robe</option>
+                <option value="vest">Vest</option>
+                <option value="jacket">Jacket</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Pants Style</label>
+              <select id="pantsStyleSelect">
+                <option value="mawashi">Mawashi</option>
+                <option value="shorts">Shorts</option>
+                <option value="pants">Pants</option>
+                <option value="hakama">Hakama</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Eye Shape</label>
+              <select id="eyeShapeSelect">
+                <option value="round">Round</option>
+                <option value="narrow">Narrow</option>
+                <option value="sleepy">Sleepy</option>
+                <option value="sharp">Sharp</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Mouth Shape</label>
+              <select id="mouthShapeSelect">
+                <option value="smile">Smile</option>
+                <option value="neutral">Neutral</option>
+                <option value="frown">Frown</option>
+                <option value="grit">Grit</option>
+              </select>
+            </div>
+            <div class="control-group colors-group">
+              <label>Primary Color</label>
+              <input id="primaryColor" type="color" value="#ffb347" />
+              <label>Secondary</label>
+              <input id="secondaryColor" type="color" value="#e74c3c" />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div id="profileItemsPanel" class="profile-panel">
-        <p data-i18n="itemsBody">Your mawashi, banners and entrance effects will appear here.</p>
-      </div>
+      <!-- RIGHT: Skill Points & Tabs -->
+      <section class="skills-and-tabs">
+        <div class="skills-card">
+          <h2>Skill Points</h2>
+          <div class="skill-available">
+            Available: <span id="availablePoints">9</span>
+          </div>
+          <div class="skills-grid">
+            <!-- 4x2 grid = 8 cells -->
+            <div class="skill-cell" data-stat="strength">
+              <span>Strength</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('strength', -1)">-</button>
+                <span id="stat-strength">0</span>
+                <button onclick="changeStat('strength', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="agility">
+              <span>Agility</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('agility', -1)">-</button>
+                <span id="stat-agility">0</span>
+                <button onclick="changeStat('agility', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="attack">
+              <span>Attack</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('attack', -1)">-</button>
+                <span id="stat-attack">0</span>
+                <button onclick="changeStat('attack', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="defense">
+              <span>Defense</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('defense', -1)">-</button>
+                <span id="stat-defense">0</span>
+                <button onclick="changeStat('defense', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="fatality">
+              <span>Fatality</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('fatality', -1)">-</button>
+                <span id="stat-fatality">0</span>
+                <button onclick="changeStat('fatality', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="charisma">
+              <span>Charisma</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('charisma', -1)">-</button>
+                <span id="stat-charisma">0</span>
+                <button onclick="changeStat('charisma', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="stamina">
+              <span>Stamina</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('stamina', -1)">-</button>
+                <span id="stat-stamina">0</span>
+                <button onclick="changeStat('stamina', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="magiska">
+              <span>Magiska</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('magiska', -1)">-</button>
+                <span id="stat-magiska">0</span>
+                <button onclick="changeStat('magiska', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div id="profileCampaignPanel" class="profile-panel">
-        <p data-i18n="campaignBody">Progress through arenas and stadiums is tracked here.</p>
-      </div>
-
-      <div id="profileCheckoutPanel" class="profile-panel">
-        <p data-i18n="checkoutBody">Tokens and cosmetic purchases summary.</p>
-      </div>
+        <!-- Tabs -->
+        <div class="profile-tabs">
+          <div class="tab-header-row">
+            <button class="tab-btn active" data-tab="statsTab" onclick="showProfileTab('statsTab', this)">Stats</button>
+            <button class="tab-btn" data-tab="itemsTab" onclick="showProfileTab('itemsTab', this)">Items</button>
+            <button class="tab-btn" data-tab="campaignTab" onclick="showProfileTab('campaignTab', this)">Campaign</button>
+            <button class="tab-btn" data-tab="checkoutTab" onclick="showProfileTab('checkoutTab', this)">Checkout</button>
+          </div>
+          <div id="statsTab" class="profile-tab active">
+            <p>Your in-depth stats will appear here.</p>
+          </div>
+          <div id="itemsTab" class="profile-tab">
+            <p>Owned cosmetics, boosts, and collectibles.</p>
+          </div>
+          <div id="campaignTab" class="profile-tab">
+            <h3>World Tour Campaign</h3>
+            <div class="campaign-map">
+              <div class="city-node">Tokyo</div>
+              <div class="city-node">Osaka</div>
+              <div class="city-node">Nagoya</div>
+              <div class="city-node">Sapporo</div>
+              <div class="city-node">Kyoto</div>
+              <div class="city-node">Fukuoka</div>
+            </div>
+            <p>Progress through each city to unlock new arenas, crowds, and rewards.</p>
+          </div>
+          <div id="checkoutTab" class="profile-tab">
+            <p>Finish your purchases and upgrades here.</p>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
-  <!-- Settings modal -->
-  <div id="settingsModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="settingsTitle">Settings</span>
-        <button class="modal-close" onclick="closeSettingsModal()">✕</button>
+  <!-- SETTINGS MODAL -->
+  <div id="settingsOverlay" class="overlay hidden" onclick="closeSettingsModal()"></div>
+  <div id="settingsModal" class="modal settings-modal hidden">
+    <div class="modal-inner">
+      <h2>Profile Settings</h2>
+      <div class="settings-grid">
+        <div class="setting-group">
+          <label>Theme</label>
+          <select id="settingTheme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Notifications</label>
+          <select id="settingNotifications">
+            <option value="all">All</option>
+            <option value="mentions">Mentions Only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Visual Settings</label>
+          <select id="settingVisual">
+            <option value="standard">Standard</option>
+            <option value="high">High Detail</option>
+            <option value="low">Low Detail</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Audio Settings</label>
+          <select id="settingAudio">
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="mute">Mute</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Controls</label>
+          <select id="settingControls">
+            <option value="wasd">WASD</option>
+            <option value="arrows">Arrow Keys</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Accessibility</label>
+          <select id="settingAccessibility">
+            <option value="standard">Standard</option>
+            <option value="high-contrast">High Contrast</option>
+            <option value="large-font">Large Font</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Language</label>
+          <select id="settingLanguage">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="ru">Русский</option>
+            <option value="ar">العربية</option>
+            <option value="bn">বাংলা</option>
+            <option value="zh">中文</option>
+            <option value="nl">Nederlands</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Privacy</label>
+          <select id="settingPrivacy">
+            <option value="public">Public</option>
+            <option value="friends">Friends Only</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Security</label>
+          <select id="settingSecurity">
+            <option value="standard">Standard</option>
+            <option value="twofactor">Two-Factor</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Account</label>
+          <select id="settingAccount">
+            <option value="active">Active</option>
+            <option value="pause">Pause</option>
+          </select>
+        </div>
       </div>
-      <ul class="settings-list">
-        <li data-i18n="settingTheme">Theme</li>
-        <li data-i18n="settingNotifications">Notifications</li>
-        <li data-i18n="settingVisual">Visual settings</li>
-        <li data-i18n="settingAudio">Audio settings</li>
-        <li data-i18n="settingControls">Controls</li>
-        <li data-i18n="settingAccessibility">Accessibility</li>
-        <li data-i18n="settingLanguage">Language</li>
-        <li data-i18n="settingPrivacy">Privacy</li>
-        <li data-i18n="settingSecurity">Security</li>
-        <li data-i18n="settingAccount">Account</li>
-      </ul>
+      <div class="settings-actions">
+        <button onclick="saveSettings()">Save</button>
+        <button onclick="closeSettingsModal()">Close</button>
+      </div>
     </div>
   </div>
 
-  <!-- Footer replicated -->
-  <footer id="globalFooter">
-    <div class="footer-top">
-      <div class="visitor-counters">
-        <div class="counter-label" data-i18n="onlineNow">ONLINE NOW</div>
-        <div class="digit-row" id="onlineDigits"></div>
-        <div class="counter-label" data-i18n="allTimeVisitors">ALL TIME VISITORS</div>
-        <div class="digit-row" id="allTimeDigits"></div>
+<section class="footer-odometers">
+    <div class="odometer-block">
+      <div class="odometer-label">Online Now</div>
+      <div id="onlineOdometer" class="odometer-display"></div>
+    </div>
+    <div class="odometer-block">
+      <div class="odometer-label">All-Time Visitors</div>
+      <div id="visitorsOdometer" class="odometer-display"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-column">
+        <h4>Accessibility</h4>
+        <button onclick="openFooterModal('Accessibility')">Accessibility</button>
+        <button onclick="openFooterModal('Assistive Modes')">Assistive Modes</button>
+      </div>
+      <div class="footer-column">
+        <h4>Company</h4>
+        <button onclick="openFooterModal('About Us')">About Us</button>
+        <button onclick="openFooterModal('Press Kit')">Press Kit</button>
+      </div>
+      <div class="footer-column">
+        <h4>Competitions</h4>
+        <button onclick="openFooterModal('Tournaments')">Tournaments</button>
+        <button onclick="openFooterModal('Player of the Month')">Player of the Month</button>
+      </div>
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <button onclick="openFooterModal('Privacy Policy')">Privacy Policy</button>
+        <button onclick="openFooterModal('Cookies Policy')">Cookies Policy</button>
+      </div>
+      <div class="footer-column">
+        <h4>Support</h4>
+        <button onclick="openFooterModal('Help Center')">Help Center</button>
+        <button onclick="openFooterModal('Report a Bug')">Report a Bug</button>
+      </div>
+      <div class="footer-column">
+        <h4>Social</h4>
+        <button onclick="openFooterModal('Newsletter')">Newsletter</button>
+        <button onclick="openFooterModal('Community Guidelines')">Community Guidelines</button>
       </div>
     </div>
 
-    <div class="footer-grid-2x3">
-      <button class="footer-col" onclick="openFooterModal('accessibilityModal')">
-        <span class="footer-heading" data-i18n="footerAccessibility">ACCESSIBILITY</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('companyModal')">
-        <span class="footer-heading" data-i18n="footerCompany">COMPANY</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('competitionsModal')">
-        <span class="footer-heading" data-i18n="footerCompetitions">COMPETITIONS</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('legalModal')">
-        <span class="footer-heading" data-i18n="footerLegal">LEGAL</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('supportModal')">
-        <span class="footer-heading" data-i18n="footerSupport">SUPPORT</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('socialModal')">
-        <span class="footer-heading" data-i18n="footerSocial">SOCIAL MEDIA</span>
-      </button>
-    </div>
-
-    <div class="language-dropup">
-      <button class="language-toggle">🌐</button>
-      <div class="language-panel">
-        <select id="globalLanguageSelect">
+    <div class="footer-bottom">
+      <div class="footer-lang">
+        <label for="siteLanguage">Language:</label>
+        <select id="siteLanguage" onchange="changeSiteLanguage()">
           <option value="en">English</option>
-          <option value="es">Español</option>
           <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="it">Italiano</option>
+          <option value="es">Español</option>
           <option value="pt">Português</option>
           <option value="ru">Русский</option>
+          <option value="ar">العربية</option>
+          <option value="bn">বাংলা</option>
           <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
+          <option value="nl">Nederlands</option>
+          <option value="hi">हिन्दी</option>
         </select>
       </div>
+      <div class="footer-copy">© 2025 Sumo Sumo Arena</div>
     </div>
   </footer>
-
-  <!-- Footer modals replicated -->
-  <div id="accessibilityModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerAccessibility">ACCESSIBILITY</span>
-        <button class="modal-close" onclick="closeFooterModal('accessibilityModal')">✕</button>
-      </div>
-      <p data-i18n="accessibilityBody">Accessibility options and suggestions.</p>
-    </div>
-  </div>
-
-  <div id="companyModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerCompany">COMPANY</span>
-        <button class="modal-close" onclick="closeFooterModal('companyModal')">✕</button>
-      </div>
-      <p data-i18n="companyBody">About the Sumo Showdown company.</p>
-    </div>
-  </div>
-
-  <div id="competitionsModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerCompetitions">COMPETITIONS</span>
-        <button class="modal-close" onclick="closeFooterModal('competitionsModal')">✕</button>
-      </div>
-      <p data-i18n="competitionsBody">Tournaments, prizes and awards.</p>
-    </div>
-  </div>
-
-  <div id="legalModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerLegal">LEGAL</span>
-        <button class="modal-close" onclick="closeFooterModal('legalModal')">✕</button>
-      </div>
-      <p data-i18n="legalBody">Terms, privacy, cookies and community rules.</p>
-    </div>
-  </div>
-
-  <div id="supportModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerSupport">SUPPORT</span>
-        <button class="modal-close" onclick="closeFooterModal('supportModal')">✕</button>
-      </div>
-      <p data-i18n="supportBody">Contact, help center, FAQs and bug reports.</p>
-    </div>
-  </div>
-
-  <div id="socialModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerSocial">SOCIAL MEDIA</span>
-        <button class="modal-close" onclick="closeFooterModal('socialModal')">✕</button>
-      </div>
-      <p data-i18n="socialBody">Links to social channels.</p>
-    </div>
-  </div>
 
   <script src="script.js"></script>
 </body>

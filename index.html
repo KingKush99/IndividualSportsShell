@@ -1,235 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sumo Showdown Hub - Home</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Sumo Sumo Arena</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="theme-dark">
+  <!-- Top Navigation -->
   <header class="main-header">
-    <button class="circle-btn profile-btn" onclick="window.location.href='profile.html'">
-      <span class="icon">👤</span>
-    </button>
-    <h1 class="site-title" data-i18n="siteTitle">Sumo Showdown Hub</h1>
-    <div class="hamburger-wrapper">
-      <button class="circle-btn hamburger-btn" onclick="toggleHamburgerMenu()">
-        ☰
+    <div class="logo-area">SUMO<span>SUMO</span></div>
+    <nav class="main-nav">
+      <button class="nav-link" onclick="showSection('homeSection')">Home</button>
+      <button class="nav-link" onclick="showSection('newsSection')">News</button>
+      <button class="nav-link" onclick="showSection('scheduleSection')">Schedule</button>
+      <button class="nav-link" onclick="showSection('scoresSection')">Scores</button>
+      <button class="nav-link" onclick="showSection('playersSection')">Players</button>
+      <button class="nav-link" onclick="showSection('standingsSection')">Standings</button>
+      <button class="nav-link" onclick="showSection('statsSection')">Stats</button>
+    </nav>
+    <!-- Corner Buttons -->
+    <div class="corner-buttons">
+      <button class="circle-btn profile-btn" onclick="window.location.href='profile.html'">
+        <span class="icon-avatar"></span>
       </button>
-      <div id="hamburgerMenu" class="hamburger-menu">
-        <button data-i18n="buyFiat">Buy with fiat</button>
-        <button data-i18n="buyCrypto">Buy with crypto</button>
-        <button data-i18n="watchAds">Watch ads</button>
-        <button data-i18n="turnCoins">Turn coins</button>
+      <div class="hamburger-wrapper">
+        <button class="circle-btn hamburger-btn" onclick="toggleHamburgerMenu()">
+          ☰
+        </button>
+        <div id="hamburgerMenu" class="hamburger-menu hidden">
+          <button onclick="openPurchaseModal('fiat')">Buy with Fiat</button>
+          <button onclick="openPurchaseModal('crypto')">Buy with Crypto</button>
+          <button onclick="openAdsModal()">Watch Ads</button>
+          <button onclick="openPurchaseModal('gems')">Buy Gems</button>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="home-main">
-    <div class="tabs">
-      <button id="tabGame" class="tab active" onclick="showHomeTab('game')" data-i18n="tabGame">Game</button>
-      <button id="tabLeaderboard" class="tab" onclick="showHomeTab('leaderboard')" data-i18n="tabGameLeaderboard">Game Leaderboard</button>
-    </div>
+  <!-- Sections -->
+  <main>
+    <!-- HOME / GAME SECTION -->
+    <section id="homeSection" class="page-section active">
+      <div class="game-top-bar">
+        <div class="game-title">Sumo Arena</div>
+        <div class="game-toggle">
+          <button id="gameTabBtn" class="toggle-btn active" onclick="showGamePanel('game')">Game</button>
+          <button id="leaderboardTabBtn" class="toggle-btn" onclick="showGamePanel('leaderboard')">Game Leaderboard</button>
+        </div>
+      </div>
 
-    <section id="gameSection" class="home-section active">
-      <canvas id="sumoCanvas" width="700" height="450"></canvas>
+      <div id="gamePanel" class="game-panel active">
+        <canvas id="sumoCanvas" width="900" height="500"></canvas>
+      </div>
+
+      <div id="leaderboardPanel" class="game-panel">
+        <h2>Game Leaderboard</h2>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Username</th>
+              <th>Wins</th>
+              <th>XP</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Populated from script.js -->
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <section id="leaderboardSection" class="home-section">
-      <h2 data-i18n="gameLeaderboardHeading">Top Wrestlers</h2>
-      <table id="gameLeaderboardTable" class="leaderboard-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th data-i18n="username">Username</th>
-            <th data-i18n="wins">Wins</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <section id="newsSection" class="page-section">
+      <h2>News</h2>
+      <p>Latest sumo headlines and tournament updates.</p>
+    </section>
+
+    <section id="scheduleSection" class="page-section">
+      <h2>Schedule</h2>
+      <p>Upcoming bouts, qualifiers, and finals.</p>
+    </section>
+
+    <section id="scoresSection" class="page-section">
+      <h2>Scores</h2>
+      <p>Recent match results and score breakdowns.</p>
+    </section>
+
+    <section id="playersSection" class="page-section">
+      <h2>Players</h2>
+      <p>Profiles of top-ranked sumo wrestlers.</p>
+    </section>
+
+    <section id="standingsSection" class="page-section">
+      <h2>Standings</h2>
+      <p>Season standings and rankings.</p>
+    </section>
+
+    <section id="statsSection" class="page-section">
+      <h2>Site Stats</h2>
+      <p>Overall gameplay, wins, losses, and XP metrics.</p>
     </section>
   </main>
 
-  <!-- Chatbot circular button bottom-left -->
-  <button id="chatbotTrigger" class="circle-btn bottom-left" onclick="openChatbotModal()">💬</button>
+  <!-- ODOMETERS JUST ABOVE FOOTER -->
+  <section class="footer-odometers">
+    <div class="odometer-block">
+      <div class="odometer-label">Online Now</div>
+      <div id="onlineOdometer" class="odometer-display"></div>
+    </div>
+    <div class="odometer-block">
+      <div class="odometer-label">All-Time Visitors</div>
+      <div id="visitorsOdometer" class="odometer-display"></div>
+    </div>
+  </section>
 
-  <!-- Mini-slots circular button bottom-right -->
-  <button id="miniSlotsTrigger" class="circle-btn bottom-right" onclick="showMiniSlots()">🎰</button>
-
-  <!-- Chatbot Modal -->
-  <div id="chatbotModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="chatbotTitle">Sumo Assistant</span>
-        <button class="modal-close" onclick="closeChatbotModal()">✕</button>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-column">
+        <h4>Accessibility</h4>
+        <button onclick="openFooterModal('Accessibility')">Accessibility</button>
+        <button onclick="openFooterModal('Assistive Modes')">Assistive Modes</button>
       </div>
-      <div class="mini-row">
-        <label for="chatLang" data-i18n="assistantLanguage">Assistant language</label>
-        <select id="chatLang">
+      <div class="footer-column">
+        <h4>Company</h4>
+        <button onclick="openFooterModal('About Us')">About Us</button>
+        <button onclick="openFooterModal('Press Kit')">Press Kit</button>
+      </div>
+      <div class="footer-column">
+        <h4>Competitions</h4>
+        <button onclick="openFooterModal('Tournaments')">Tournaments</button>
+        <button onclick="openFooterModal('Player of the Month')">Player of the Month</button>
+      </div>
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <button onclick="openFooterModal('Privacy Policy')">Privacy Policy</button>
+        <button onclick="openFooterModal('Cookies Policy')">Cookies Policy</button>
+      </div>
+      <div class="footer-column">
+        <h4>Support</h4>
+        <button onclick="openFooterModal('Help Center')">Help Center</button>
+        <button onclick="openFooterModal('Report a Bug')">Report a Bug</button>
+      </div>
+      <div class="footer-column">
+        <h4>Social</h4>
+        <button onclick="openFooterModal('Newsletter')">Newsletter</button>
+        <button onclick="openFooterModal('Community Guidelines')">Community Guidelines</button>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-lang">
+        <label for="siteLanguage">Language:</label>
+        <select id="siteLanguage" onchange="changeSiteLanguage()">
           <option value="en">English</option>
-          <option value="es">Español</option>
           <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="it">Italiano</option>
+          <option value="es">Español</option>
           <option value="pt">Português</option>
           <option value="ru">Русский</option>
+          <option value="ar">العربية</option>
+          <option value="bn">বাংলা</option>
           <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
+          <option value="nl">Nederlands</option>
+          <option value="hi">हिन्दी</option>
         </select>
       </div>
-      <div id="chatLog" class="chat-log"></div>
-      <div class="chat-input-row">
-        <input id="chatInput" type="text" placeholder="Ask about sumo..." data-i18n-placeholder="chatPlaceholder">
-        <button onclick="sendFakeChat()" data-i18n="send">Send</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mini-Slots Modal -->
-  <div id="miniSlotsModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="miniSlotsTitle">Sumo Reel Mini-Slots</span>
-        <button class="modal-close" onclick="hideMiniSlots()">✕</button>
-      </div>
-
-      <div class="mini-row">
-        <label for="reelCountSelect" data-i18n="reels">Reels:</label>
-        <select id="reelCountSelect">
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
-      </div>
-
-      <div id="reelsContainer" class="reels-container"></div>
-
-      <div class="mini-bottom">
-        <div class="bets">
-          <button onclick="setBet(10)">10</button>
-          <button onclick="setBet(25)">25</button>
-          <button onclick="setBet(50)">50</button>
-          <button onclick="setBet(100)">100</button>
-          <button onclick="setBet(500)">500</button>
-        </div>
-
-        <button id="pushSpinBtn" class="push-btn">PUSH</button>
-
-        <div id="slotLever" class="lever" onclick="pullLever()"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer + language drop-up -->
-  <footer id="globalFooter">
-    <div class="footer-top">
-      <div class="visitor-counters">
-        <div class="counter-label" data-i18n="onlineNow">ONLINE NOW</div>
-        <div class="digit-row" id="onlineDigits"></div>
-        <div class="counter-label" data-i18n="allTimeVisitors">ALL TIME VISITORS</div>
-        <div class="digit-row" id="allTimeDigits"></div>
-      </div>
-    </div>
-
-    <div class="footer-grid-2x3">
-      <button class="footer-col" onclick="openFooterModal('accessibilityModal')">
-        <span class="footer-heading" data-i18n="footerAccessibility">ACCESSIBILITY</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('companyModal')">
-        <span class="footer-heading" data-i18n="footerCompany">COMPANY</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('competitionsModal')">
-        <span class="footer-heading" data-i18n="footerCompetitions">COMPETITIONS</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('legalModal')">
-        <span class="footer-heading" data-i18n="footerLegal">LEGAL</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('supportModal')">
-        <span class="footer-heading" data-i18n="footerSupport">SUPPORT</span>
-      </button>
-      <button class="footer-col" onclick="openFooterModal('socialModal')">
-        <span class="footer-heading" data-i18n="footerSocial">SOCIAL MEDIA</span>
-      </button>
-    </div>
-
-    <div class="language-dropup">
-      <button class="language-toggle">🌐</button>
-      <div class="language-panel">
-        <select id="globalLanguageSelect">
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="it">Italiano</option>
-          <option value="pt">Português</option>
-          <option value="ru">Русский</option>
-          <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
-        </select>
-      </div>
+      <div class="footer-copy">© 2025 Sumo Sumo Arena</div>
     </div>
   </footer>
 
-  <!-- Footer modals -->
-  <div id="accessibilityModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerAccessibility">ACCESSIBILITY</span>
-        <button class="modal-close" onclick="closeFooterModal('accessibilityModal')">✕</button>
-      </div>
-      <p data-i18n="accessibilityBody">Accessibility options and suggestions.</p>
+  <!-- FLOATING FABs -->
+  <button id="chatbotFab" class="circle-btn fab chatbot-fab" onclick="toggleChatbot()">
+    💬
+  </button>
+  <button id="miniSlotsFab" class="circle-btn fab minislot-fab" onclick="toggleMiniSlots()">
+    🎰
+  </button>
+
+  <!-- CHATBOT DROP-UP -->
+  <div id="chatbotPanel" class="chatbot-panel hidden">
+    <div class="chatbot-header">
+      <span>Sumo Assistant</span>
+      <select id="chatbotLanguage" onchange="updateChatbotLanguage()">
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="es">ES</option>
+        <option value="pt">PT</option>
+        <option value="ru">RU</option>
+        <option value="ar">AR</option>
+        <option value="bn">BN</option>
+        <option value="zh">ZH</option>
+        <option value="nl">NL</option>
+        <option value="hi">HI</option>
+      </select>
+    </div>
+    <div id="chatbotMessages" class="chatbot-messages"></div>
+    <div class="chatbot-upload">
+      <label>
+        📎
+        <input type="file" id="chatbotFiles" multiple accept="image/*,video/*" />
+      </label>
+      <small>Up to 100 screenshots &amp; 100s clips</small>
+    </div>
+    <div class="chatbot-input-row">
+      <input id="chatbotInput" type="text" placeholder="Ask about the arena, game, or profile..." onkeydown="if(event.key==='Enter'){sendChatbotMessage();}" />
+      <button onclick="sendChatbotMessage()">Send</button>
     </div>
   </div>
 
-  <div id="companyModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerCompany">COMPANY</span>
-        <button class="modal-close" onclick="closeFooterModal('companyModal')">✕</button>
+  <!-- MINI-SLOTS DROP-UP -->
+  <div id="miniSlotsPanel" class="mini-slots-panel hidden">
+    <div class="mini-slots-header">
+      <span>Mini Slots</span>
+      <label class="auto-spin-toggle">
+        <input type="checkbox" id="autoSpinToggle" onchange="handleAutoSpinChange()" />
+        Auto Spin
+      </label>
+    </div>
+    <div class="mini-slots-body">
+      <div class="reels-row">
+        <div id="reelsDisplay" class="reels-display">
+          <!-- Reels go here -->
+        </div>
+        <div id="lever" class="lever" onclick="pullLever()">
+          <div class="lever-stick"></div>
+          <div class="lever-knob"></div>
+        </div>
       </div>
-      <p data-i18n="companyBody">About the Sumo Showdown company.</p>
+      <div class="mini-slots-controls">
+        <div class="coins-dropup dropup">
+          <button class="dropup-btn" onclick="toggleDropup('coinOptions')">Bet ▲</button>
+          <div id="coinOptions" class="dropup-menu hidden">
+            <button onclick="setBet(10)">10</button>
+            <button onclick="setBet(25)">25</button>
+            <button onclick="setBet(50)">50</button>
+            <button onclick="setBet(100)">100</button>
+            <button onclick="setBet(500)">500</button>
+          </div>
+        </div>
+        <button id="pushButton" class="push-button" onclick="spinReels()">PUSH</button>
+        <div class="reels-dropup dropup">
+          <button class="dropup-btn" onclick="toggleDropup('reelCountMenu')">Reels ▲</button>
+          <div id="reelCountMenu" class="dropup-menu hidden">
+            <button onclick="setReelCount(3)">3</button>
+            <button onclick="setReelCount(4)">4</button>
+            <button onclick="setReelCount(5)">5</button>
+            <button onclick="setReelCount(6)">6</button>
+          </div>
+        </div>
+      </div>
+      <div class="mini-slots-status">
+        Bet: <span id="currentBet">10</span> • Reels: <span id="currentReels">3</span>
+      </div>
     </div>
   </div>
 
-  <div id="competitionsModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerCompetitions">COMPETITIONS</span>
-        <button class="modal-close" onclick="closeFooterModal('competitionsModal')">✕</button>
-      </div>
-      <p data-i18n="competitionsBody">Tournaments, prizes and awards.</p>
+  <!-- GENERIC MODALS -->
+  <div id="overlay" class="overlay hidden" onclick="closeAllModals()"></div>
+
+  <div id="purchaseModal" class="modal hidden">
+    <div class="modal-inner">
+      <h3 id="purchaseTitle">Purchase</h3>
+      <p>Coming soon: secure purchasing flow.</p>
+      <button onclick="closeAllModals()">Close</button>
     </div>
   </div>
 
-  <div id="legalModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerLegal">LEGAL</span>
-        <button class="modal-close" onclick="closeFooterModal('legalModal')">✕</button>
-      </div>
-      <p data-i18n="legalBody">Terms, privacy, cookies and community rules.</p>
+  <div id="adsModal" class="modal hidden">
+    <div class="modal-inner">
+      <h3>Watch Ads</h3>
+      <p>Earn gems by watching ads. (Placeholder banner here.)</p>
+      <button onclick="closeAllModals()">Close</button>
     </div>
   </div>
 
-  <div id="supportModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerSupport">SUPPORT</span>
-        <button class="modal-close" onclick="closeFooterModal('supportModal')">✕</button>
-      </div>
-      <p data-i18n="supportBody">Contact, help center, FAQs and bug reports.</p>
-    </div>
-  </div>
-
-  <div id="socialModal" class="modal-backdrop">
-    <div class="mini-modal">
-      <div class="mini-header">
-        <span data-i18n="footerSocial">SOCIAL MEDIA</span>
-        <button class="modal-close" onclick="closeFooterModal('socialModal')">✕</button>
-      </div>
-      <p data-i18n="socialBody">Links to social channels.</p>
+  <div id="footerModal" class="modal hidden">
+    <div class="modal-inner">
+      <h3 id="footerModalTitle"></h3>
+      <p id="footerModalBody"></p>
+      <button onclick="closeAllModals()">Close</button>
     </div>
   </div>
 
