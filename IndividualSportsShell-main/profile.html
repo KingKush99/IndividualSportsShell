@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile • Sumo Sumo Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-dark">
+  <header class="profile-header">
+    <button class="circle-btn back-btn" onclick="window.location.href='index.html'">⟵</button>
+    <div class="profile-username" id="profileUsernameHeader">SumoUser123</div>
+    <button class="circle-btn settings-btn" onclick="openSettingsModal()">⚙</button>
+  </header>
+
+  <main class="profile-main">
+    <!-- Top Instagram-style row -->
+    <section class="profile-top-row">
+      <div class="profile-avatar-block">
+        <div class="profile-avatar" id="profileAvatarPreview"></div>
+        <label class="avatar-upload">
+          Change
+          <input type="file" id="avatarInput" accept="image/*" />
+        </label>
+      </div>
+      <div class="profile-meta">
+        <div class="profile-name-bio">
+          <h1 id="profileUsernameView">SumoUser123</h1>
+          <textarea id="profileBio" maxlength="264" placeholder="Write your bio (max 264 characters)..."></textarea>
+        </div>
+        <div class="profile-follow-row">
+          <div><span id="followersCount">128</span> Followers</div>
+          <div><span id="followingCount">87</span> Following</div>
+          <div><span id="friendsCount">34</span> Friends</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Level bar -->
+    <section class="level-section">
+      <div class="level-label">
+        Level <span id="currentLevel">0</span>
+      </div>
+      <div class="level-bar">
+        <div id="levelProgress" class="level-progress"></div>
+      </div>
+      <div class="level-xp">
+        <span id="currentXP">0</span> XP
+      </div>
+    </section>
+
+    <section class="profile-content-row">
+      <!-- LEFT: Character Customization -->
+      <section class="customization-card">
+        <h2>Character Customization</h2>
+        <div class="customization-body">
+          <div class="customization-preview">
+            <canvas id="avatarCanvas" width="220" height="260"></canvas>
+            <button class="rotate-btn" onclick="rotateAvatar()">Rotate</button>
+          </div>
+          <div class="customization-controls">
+            <div class="control-group">
+              <label>Body Type</label>
+              <select id="bodyTypeSelect">
+                <option value="classic">Classic</option>
+                <option value="wide">Wide</option>
+                <option value="tall">Tall</option>
+                <option value="compact">Compact</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Hair Style</label>
+              <select id="hairStyleSelect">
+                <option value="topknot">Topknot</option>
+                <option value="short">Short</option>
+                <option value="long">Long</option>
+                <option value="bald">Bald</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Shirt Style</label>
+              <select id="shirtStyleSelect">
+                <option value="robe">Robe</option>
+                <option value="vest">Vest</option>
+                <option value="jacket">Jacket</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Pants Style</label>
+              <select id="pantsStyleSelect">
+                <option value="mawashi">Mawashi</option>
+                <option value="shorts">Shorts</option>
+                <option value="pants">Pants</option>
+                <option value="hakama">Hakama</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Eye Shape</label>
+              <select id="eyeShapeSelect">
+                <option value="round">Round</option>
+                <option value="narrow">Narrow</option>
+                <option value="sleepy">Sleepy</option>
+                <option value="sharp">Sharp</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Mouth Shape</label>
+              <select id="mouthShapeSelect">
+                <option value="smile">Smile</option>
+                <option value="neutral">Neutral</option>
+                <option value="frown">Frown</option>
+                <option value="grit">Grit</option>
+              </select>
+            </div>
+            <div class="control-group colors-group">
+              <label>Primary Color</label>
+              <input id="primaryColor" type="color" value="#ffb347" />
+              <label>Secondary</label>
+              <input id="secondaryColor" type="color" value="#e74c3c" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Skill Points & Tabs -->
+      <section class="skills-and-tabs">
+        <div class="skills-card">
+          <h2>Skill Points</h2>
+          <div class="skill-available">
+            Available: <span id="availablePoints">9</span>
+          </div>
+          <div class="skills-grid">
+            <!-- 4x2 grid = 8 cells -->
+            <div class="skill-cell" data-stat="strength">
+              <span>Strength</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('strength', -1)">-</button>
+                <span id="stat-strength">0</span>
+                <button onclick="changeStat('strength', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="agility">
+              <span>Agility</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('agility', -1)">-</button>
+                <span id="stat-agility">0</span>
+                <button onclick="changeStat('agility', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="attack">
+              <span>Attack</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('attack', -1)">-</button>
+                <span id="stat-attack">0</span>
+                <button onclick="changeStat('attack', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="defense">
+              <span>Defense</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('defense', -1)">-</button>
+                <span id="stat-defense">0</span>
+                <button onclick="changeStat('defense', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="fatality">
+              <span>Fatality</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('fatality', -1)">-</button>
+                <span id="stat-fatality">0</span>
+                <button onclick="changeStat('fatality', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="charisma">
+              <span>Charisma</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('charisma', -1)">-</button>
+                <span id="stat-charisma">0</span>
+                <button onclick="changeStat('charisma', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="stamina">
+              <span>Stamina</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('stamina', -1)">-</button>
+                <span id="stat-stamina">0</span>
+                <button onclick="changeStat('stamina', 1)">+</button>
+              </div>
+            </div>
+            <div class="skill-cell" data-stat="magiska">
+              <span>Magiska</span>
+              <div class="skill-controls">
+                <button onclick="changeStat('magiska', -1)">-</button>
+                <span id="stat-magiska">0</span>
+                <button onclick="changeStat('magiska', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="profile-tabs">
+          <div class="tab-header-row">
+            <button class="tab-btn active" data-tab="statsTab" onclick="showProfileTab('statsTab', this)">Stats</button>
+            <button class="tab-btn" data-tab="itemsTab" onclick="showProfileTab('itemsTab', this)">Items</button>
+            <button class="tab-btn" data-tab="campaignTab" onclick="showProfileTab('campaignTab', this)">Campaign</button>
+            <button class="tab-btn" data-tab="checkoutTab" onclick="showProfileTab('checkoutTab', this)">Checkout</button>
+          </div>
+          <div id="statsTab" class="profile-tab active">
+            <p>Your in-depth stats will appear here.</p>
+          </div>
+          <div id="itemsTab" class="profile-tab">
+            <p>Owned cosmetics, boosts, and collectibles.</p>
+          </div>
+          <div id="campaignTab" class="profile-tab">
+            <h3>World Tour Campaign</h3>
+            <div class="campaign-map">
+              <div class="city-node">Tokyo</div>
+              <div class="city-node">Osaka</div>
+              <div class="city-node">Nagoya</div>
+              <div class="city-node">Sapporo</div>
+              <div class="city-node">Kyoto</div>
+              <div class="city-node">Fukuoka</div>
+            </div>
+            <p>Progress through each city to unlock new arenas, crowds, and rewards.</p>
+          </div>
+          <div id="checkoutTab" class="profile-tab">
+            <p>Finish your purchases and upgrades here.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsOverlay" class="overlay hidden" onclick="closeSettingsModal()"></div>
+  <div id="settingsModal" class="modal settings-modal hidden">
+    <div class="modal-inner">
+      <h2>Profile Settings</h2>
+      <div class="settings-grid">
+        <div class="setting-group">
+          <label>Theme</label>
+          <select id="settingTheme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Notifications</label>
+          <select id="settingNotifications">
+            <option value="all">All</option>
+            <option value="mentions">Mentions Only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Visual Settings</label>
+          <select id="settingVisual">
+            <option value="standard">Standard</option>
+            <option value="high">High Detail</option>
+            <option value="low">Low Detail</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Audio Settings</label>
+          <select id="settingAudio">
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="mute">Mute</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Controls</label>
+          <select id="settingControls">
+            <option value="wasd">WASD</option>
+            <option value="arrows">Arrow Keys</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Accessibility</label>
+          <select id="settingAccessibility">
+            <option value="standard">Standard</option>
+            <option value="high-contrast">High Contrast</option>
+            <option value="large-font">Large Font</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Language</label>
+          <select id="settingLanguage">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="ru">Русский</option>
+            <option value="ar">العربية</option>
+            <option value="bn">বাংলা</option>
+            <option value="zh">中文</option>
+            <option value="nl">Nederlands</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Privacy</label>
+          <select id="settingPrivacy">
+            <option value="public">Public</option>
+            <option value="friends">Friends Only</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Security</label>
+          <select id="settingSecurity">
+            <option value="standard">Standard</option>
+            <option value="twofactor">Two-Factor</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Account</label>
+          <select id="settingAccount">
+            <option value="active">Active</option>
+            <option value="pause">Pause</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button onclick="saveSettings()">Save</button>
+        <button onclick="closeSettingsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

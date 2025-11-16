@@ -1,0 +1,164 @@
+/* Core layout / NHL‑style theme */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(circle at top,#061a3a,#020712 55%,#000 100%);color:#f5f7ff;min-height:100vh}
+
+/* Themes (used for future variations) */
+body.theme-1{}
+body.theme-2{filter:hue-rotate(-10deg)}
+body.theme-3{filter:hue-rotate(10deg)}
+body.theme-4{filter:saturate(1.1)}
+body.theme-5{filter:contrast(1.1)}
+body.theme-6{filter:brightness(1.05)}
+body.theme-7{filter:hue-rotate(40deg)}
+body.theme-8{filter:hue-rotate(-40deg)}
+body.theme-9{filter:saturate(1.2)}
+body.theme-10{filter:brightness(1.08)}
+
+/* Corner FABs */
+.fab{position:fixed;width:54px;height:54px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,16,28,.95);color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.6);cursor:pointer;z-index:1500}
+.fab:hover{background:#0f264a}
+.fab-icon{font-size:22px}
+.fab-profile{top:16px;left:16px}
+.fab-menu{top:16px;right:16px}
+.fab-slots{right:18px;bottom:18px}
+.fab-chat{left:18px;bottom:18px}
+
+/* Dropdown menu */
+.dropdown{position:fixed;top:80px;right:16px;background:rgba(6,12,24,.98);border:1px solid rgba(255,255,255,.08);border-radius:14px;min-width:280px;padding:.6rem;display:grid;gap:.4rem;z-index:1400;backdrop-filter:blur(12px)}
+.dropdown.hidden{display:none}
+.dropdown .menu-head{display:flex;justify-content:space-between;align-items:center;padding:.25rem .5rem;color:#c5d7ff;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+.dropdown button{background:#0e1a32;border:1px solid rgba(255,255,255,.07);color:#f7fbff;border-radius:10px;padding:.55rem .7rem;cursor:pointer;text-align:left;font-size:.9rem}
+.dropdown button:hover{background:#152543}
+.dropdown-section{margin-top:.4rem;border-top:1px solid rgba(255,255,255,.1);padding-top:.4rem}
+.linkish{background:none;border:none;color:#9fb4ff;cursor:pointer}
+.linkish:hover{text-decoration:underline}
+.small{font-size:.75rem;opacity:.8}
+.themes-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.3rem}
+.theme-pill{font-size:.8rem;display:flex;justify-content:space-between;align-items:center}
+.theme-pill span.cost{opacity:.7}
+
+/* Header */
+.site-header{position:sticky;top:0;z-index:500;background:linear-gradient(to right,#050b18,#050b18dd);border-bottom:1px solid rgba(255,255,255,.08);padding:.35rem .75rem .5rem .75rem}
+.logo-row{display:flex;align-items:center;gap:.75rem;max-width:1100px;margin:0 auto .25rem auto}
+.logo-mark{width:38px;height:38px;border-radius:8px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.logo-text .brand{font-weight:700;font-size:1.1rem}
+.logo-text .sub{font-size:.8rem;opacity:.75}
+.live-pill{margin-left:auto;font-size:.8rem;background:#e53935;color:#fff;padding:.25rem .6rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em}
+
+/* Tabs */
+.tabs{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;max-width:1100px;margin:0 auto}
+.tab{background:transparent;color:#c7d5ff;border:1px solid transparent;border-radius:999px;padding:.35rem .7rem;font-size:.85rem;cursor:pointer}
+.tab[aria-selected="true"],.tab:hover{background:#1b2b4f;border-color:rgba(255,255,255,.1)}
+
+/* Score bar */
+.scorebar{display:flex;gap:.8rem;align-items:center;background:#0f1c35;color:#f5f7ff;padding:.45rem 1rem;position:sticky;top:70px;z-index:400;font-size:.85rem}
+.scorebar strong{letter-spacing:.05em;text-transform:uppercase;color:#9fb4ff}
+
+/* Main layout */
+main{max-width:1100px;margin:1rem auto 4rem auto;padding:0 1rem}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:rgba(8,14,32,.96);border-radius:16px;border:1px solid rgba(255,255,255,.06);padding:1rem}
+.hero{grid-column:1/-1;background:radial-gradient(circle at top,#123066,#070d1c 60%)}
+.hero h1{margin-top:0}
+.hero-bottom{display:flex;gap:2rem;margin-top:1rem}
+.label{font-size:.8rem;opacity:.8;text-transform:uppercase}
+.big-num{font-family:monospace;font-size:1.4rem;background:#050912;padding:.25rem .5rem;border-radius:.35rem;border:1px solid rgba(255,255,255,.12)}
+
+/* Grids */
+.home-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.5fr);gap:1rem}
+@media (max-width:900px){
+  .home-grid{grid-template-columns:1fr}
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:.75rem}
+.live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:.75rem}
+.live-card{background:rgba(8,14,32,.96);border-radius:16px;border:1px solid rgba(255,255,255,.08);padding:1rem}
+.meta{font-size:.8rem;opacity:.8}
+
+/* Table */
+.table{width:100%;border-collapse:collapse;margin-top:.35rem;font-size:.9rem}
+.table th,.table td{padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.table th{text-align:left;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;background:rgba(9,18,40,.8)}
+.table tr:last-child td{border-bottom:none}
+
+/* Sumo mini‑game */
+.sumo canvas{margin-top:.75rem;background:#050914;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+.rugby-ui{display:flex;gap:.5rem;align-items:center;margin-top:.5rem;flex-wrap:wrap}
+.rugby-ui button{background:#1b3b7a;border:none;color:#fff;border-radius:999px;padding:.4rem .9rem;cursor:pointer;font-size:.85rem}
+.rugby-ui button:hover{background:#2753a3}
+#sumoStatus{margin-top:.4rem;font-size:.85rem}
+
+/* Modals */
+.modal{position:fixed;left:50%;transform:translateX(-50%);background:rgba(7,12,26,.98);border-radius:18px;border:1px solid rgba(255,255,255,.12);color:#f5f7ff;min-width:320px;max-width:92vw;z-index:1200;backdrop-filter:blur(14px)}
+.modal.hidden{display:none}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:.6rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.modal .close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.modal-dropup{bottom:85px;right:18px;left:auto;transform:none}
+.modal-dropup-left{bottom:85px;left:18px;right:auto;transform:none}
+.sized{width:380px}
+
+/* Slots */
+.slots-wrap{display:flex;align-items:center;gap:1rem;padding:1rem}
+.lever{width:26px;height:120px;background:#111a2c;border-radius:18px;border:1px solid rgba(255,255,255,.1);position:relative;cursor:grab}
+.lever .knob{position:absolute;left:50%;transform:translateX(-50%);top:8px;width:20px;height:20px;background:#ff5252;border-radius:50%;box-shadow:0 2px 0 rgba(0,0,0,.6)}
+.lever.pull .knob{animation:pull .4s forwards}
+@keyframes pull{to{top:92px}}
+.slots-window{width:260px;height:70px;border-radius:12px;border:1px solid rgba(255,255,255,.12);overflow:hidden;background:#050914;display:flex;align-items:center;justify-content:center}
+.reels{display:flex;gap:.4rem}
+.reel{width:64px;height:56px;border-radius:10px;background:#020610;border:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative}
+.cell{display:flex;align-items:center;justify-content:center;height:56px;font-size:26px}
+.slots-controls{display:flex;gap:.6rem;align-items:center;padding:0 1rem 1rem 1rem;flex-wrap:wrap;font-size:.85rem}
+.slots-controls label select{margin-left:.25rem}
+.slots-controls button{background:#1b3b7a;border:none;color:#fff;border-radius:999px;padding:.35rem .8rem;cursor:pointer}
+.result{padding:0 1rem 1rem;font-size:.85rem}
+
+/* Chat */
+.chat-body{padding:1rem;display:grid;gap:.6rem;font-size:.9rem}
+.chat-body .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.chat-body .row.split{justify-content:space-between}
+.chat-log{height:220px;border-radius:10px;border:1px solid rgba(255,255,255,.12);padding:.45rem;overflow:auto;background:#050914}
+.msg-wrap{display:flex;margin:.15rem 0}
+.msg{max-width:80%;padding:.35rem .6rem;border-radius:12px;font-size:.85rem}
+.bot{background:#111c33}
+.me{background:#2753a3;margin-left:auto}
+.chat-body input[type="text"], .chat-body input:not([type]){flex:1;min-width:0}
+.chat-body input, .chat-body select{background:#050a15;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#f5f7ff;padding:.35rem .7rem}
+.chat-body button{background:#2753a3;border:none;color:#fff;border-radius:999px;padding:.35rem .8rem;cursor:pointer}
+.hint{font-size:.75rem;opacity:.75}
+
+/* Footer */
+.site-footer{background:#050910;color:#aab5d6;padding:1.1rem 1rem 1.5rem 1rem;border-top:1px solid rgba(255,255,255,.16)}
+.columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;max-width:1100px;margin:0 auto}
+.columns h4{margin:.15rem 0 .4rem 0;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
+.columns ul{list-style:none;margin:0;padding:0;display:grid;gap:.3rem;font-size:.85rem}
+.columns a{color:#c7d5ff;text-decoration:none}
+.columns a:hover{text-decoration:underline}
+.store{display:inline-flex;align-items:center;gap:.4rem;background:#050d1e;border-radius:10px;border:1px solid rgba(255,255,255,.12);padding:.4rem .7rem;font-size:.85rem;margin-right:.3rem}
+.footer-bottom{max-width:1100px;margin:.85rem auto 0 auto;font-size:.8rem;opacity:.85}
+
+/* Profile page tweaks */
+.profile-page{background:radial-gradient(circle at top,#341233,#120212 60%)}
+.profile-header{position:sticky;top:0;background:rgba(52,18,51,.95);border-bottom:1px solid rgba(255,255,255,.2);padding:.4rem 1rem;z-index:600}
+.profile-tabs{display:flex;gap:.5rem;align-items:center;justify-content:flex-start}
+.profile-tabs a{background:rgba(255,255,255,.1);color:#ffe9f7;text-decoration:none;padding:.35rem .8rem;border-radius:999px;font-size:.85rem}
+.profile-tabs a.active{background:#ff5fa8}
+.profile-main{max-width:780px;margin:1rem auto;padding:0 1rem}
+.profile-hero{display:grid;grid-template-columns:90px 1fr 120px;gap:.75rem;align-items:center;background:rgba(255,255,255,.06);border-radius:18px;border:1px solid rgba(255,255,255,.22);padding:1rem}
+.profile-hero .avatar{width:80px;height:80px;border-radius:50%;background:conic-gradient(from 0deg,#ff5fa8,#ffc96b,#7cf3ff,#ff5fa8);display:flex;align-items:center;justify-content:center;padding:3px}
+.profile-hero .buddy{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 30% 20%,#fff,#ffd1eb 55%,#f24f98 100%);animation:spinBuddy 8s linear infinite}
+.profile-hero .identity input,.profile-hero select{width:100%;margin-top:.25rem}
+.profile-hero input,.profile-hero select{background:rgba(0,0,0,.25);border-radius:999px;border:1px solid rgba(255,255,255,.35);color:#fff;padding:.35rem .7rem;font-size:.85rem}
+.profile-hero .level{text-align:center}
+.profile-hero .level .big{font-size:2.1rem;font-weight:700}
+.toggle{display:flex;flex-direction:column;align-items:center;font-size:.8rem;margin-top:.35rem}
+.toggle input{margin-bottom:.2rem}
+@keyframes spinBuddy{to{transform:rotate(360deg)}}
+#autoSpin:not(:checked) ~ span{}
+.xp-strip{display:flex;align-items:center;gap:.6rem;margin:1rem 0;font-size:.9rem}
+.xp{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden}
+.xp span{display:block;height:100%;background:linear-gradient(90deg,#ff5fa8,#ffd36b)}
+.totals{background:rgba(255,255,255,.06);border-radius:18px;border:1px solid rgba(255,255,255,.18);padding:1rem}
+.stats{list-style:none;margin:0;padding:0;display:grid;gap:.3rem;font-size:.9rem}
+.stats b{float:right}
